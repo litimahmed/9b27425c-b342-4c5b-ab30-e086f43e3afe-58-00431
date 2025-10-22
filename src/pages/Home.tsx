@@ -31,24 +31,6 @@ const Home = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Test mode - press 'H' key to toggle all section skeletons AND notify parent Layout
-  useEffect(() => {
-    const handleKeyPress = (event: KeyboardEvent) => {
-      if (event.key === 'h' || event.key === 'H') {
-        setSectionsLoading(prev => {
-          const newState = !prev;
-          // Dispatch custom event to notify Layout about header/footer loading state
-          window.dispatchEvent(new CustomEvent('toggleHeaderFooterLoading', { 
-            detail: { loading: newState } 
-          }));
-          return newState;
-        });
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
-  }, []);
 
   return (
     <div className="bg-background">

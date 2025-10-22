@@ -53,7 +53,6 @@ const PartnerApplication = () => {
   const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [headerFooterLoading, setHeaderFooterLoading] = useState(false);
   const [formData, setFormData] = useState({
     // Step 1: Legal Entity
     companyName: '',
@@ -81,94 +80,6 @@ const PartnerApplication = () => {
   });
 
   const progress = (currentStep / steps.length) * 100;
-
-  useEffect(() => {
-    const handleKeyPress = (event: KeyboardEvent) => {
-      if (event.key === 'H' || event.key === 'h') {
-        const newLoading = !headerFooterLoading;
-        setHeaderFooterLoading(newLoading);
-        
-        // Dispatch custom event to Layout component
-        window.dispatchEvent(new CustomEvent('toggleHeaderFooterLoading', {
-          detail: { loading: newLoading }
-        }));
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [headerFooterLoading]);
-
-  const PartnerApplicationSkeleton = () => (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-4xl mx-auto px-6 py-12">
-        {/* Header Skeleton */}
-        <div className="mb-8">
-          <Skeleton className="h-10 w-20 mb-6 bg-muted/40" />
-          <div className="text-center">
-            <Skeleton className="h-10 w-64 mx-auto mb-2 bg-muted/60" />
-            <Skeleton className="h-4 w-80 mx-auto bg-muted/40" />
-          </div>
-        </div>
-
-        {/* Progress Skeleton */}
-        <Card className="mb-8">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <Skeleton className="h-4 w-24 bg-muted/60" />
-              <Skeleton className="h-6 w-12 bg-muted/40" />
-            </div>
-            <Skeleton className="h-2 w-full mb-6 bg-muted/40" />
-            <div className="flex justify-between">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="flex flex-col items-center">
-                  <Skeleton className="w-8 h-8 rounded-full bg-primary/30" />
-                  <Skeleton className="h-3 w-16 mt-2 bg-muted/40" />
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Form Content Skeleton */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-3">
-              <Skeleton className="w-5 h-5 bg-primary/30" />
-              <Skeleton className="h-6 w-48 bg-muted/60" />
-            </div>
-            <Skeleton className="h-4 w-64 bg-muted/40" />
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-24 bg-muted/60" />
-                <Skeleton className="h-10 w-full bg-muted/40" />
-              </div>
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-24 bg-muted/60" />
-                <Skeleton className="h-10 w-full bg-muted/40" />
-              </div>
-            </div>
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="space-y-2">
-                <Skeleton className="h-4 w-32 bg-muted/60" />
-                <Skeleton className="h-10 w-full bg-muted/40" />
-              </div>
-            ))}
-            <div className="flex justify-between">
-              <Skeleton className="h-10 w-20 bg-muted/40" />
-              <Skeleton className="h-10 w-24 bg-primary/30" />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
-  );
-
-  if (headerFooterLoading) {
-    return <PartnerApplicationSkeleton />;
-  }
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));

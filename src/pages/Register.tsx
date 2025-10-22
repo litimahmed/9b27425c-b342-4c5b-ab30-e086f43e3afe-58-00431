@@ -91,7 +91,6 @@ const Register = () => {
   const [ninCheckLoading, setNinCheckLoading] = useState(false);
   const [phoneExists, setPhoneExists] = useState<boolean | null>(null);
   const [phoneCheckLoading, setPhoneCheckLoading] = useState(false);
-  const [headerFooterLoading, setHeaderFooterLoading] = useState(false);
   const maxSteps = userType === 'student' ? 5 : 6;
 
   // Load theme and uploaded files on component mount
@@ -112,23 +111,7 @@ const Register = () => {
         console.error('Failed to parse saved files:', error);
       }
     }
-
-    // H key event listener for skeleton loading
-    const handleKeyPress = (event: KeyboardEvent) => {
-      if (event.key === 'H' || event.key === 'h') {
-        const newLoading = !headerFooterLoading;
-        setHeaderFooterLoading(newLoading);
-        
-        // Dispatch custom event to Layout component
-        window.dispatchEvent(new CustomEvent('toggleHeaderFooterLoading', {
-          detail: { loading: newLoading }
-        }));
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [headerFooterLoading]);
+  }, []);
 
   const toggleTheme = () => {
     const newIsDark = !isDark;
@@ -960,11 +943,6 @@ const Register = () => {
       </div>
     </div>
   );
-
-  // Show skeleton if header/footer loading is active
-  if (headerFooterLoading) {
-    return <RegisterSkeleton />;
-  }
 
   // Show OTP verification screen if needed
   if (showOtpVerification) {
