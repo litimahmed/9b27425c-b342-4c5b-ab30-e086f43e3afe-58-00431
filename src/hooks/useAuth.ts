@@ -67,7 +67,7 @@ export function useAuth() {
         // Continue even if this fails
       }
 
-      const { error } = await supabase.auth.signInWithPassword({
+      const { error, data } = await supabase.auth.signInWithPassword({
         email,
         password
       });
@@ -76,9 +76,22 @@ export function useAuth() {
         return { error };
       }
 
-      // Force page refresh on successful login
+      // Get user profile to determine redirect
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('user_type')
+        .eq('id', data.user.id)
+        .single();
+
+      // Redirect based on user type
       setTimeout(() => {
-        window.location.href = '/';
+        if (profile?.user_type === 'student') {
+          window.location.href = '/student';
+        } else if (profile?.user_type === 'teacher') {
+          window.location.href = '/teacher';
+        } else {
+          window.location.href = '/';
+        }
       }, 100);
       
       return { error: null };

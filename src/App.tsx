@@ -14,6 +14,7 @@ import { AmbientSoundProvider } from "./contexts/AmbientSoundContext";
 import { FloatingTimer } from "./components/ui/FloatingTimer";
 import { FloatingSoundPlayer } from "./components/ui/FloatingSoundPlayer";
 import { useTimerContext } from "./contexts/TimerContext";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 
 // Lazy-loaded page components
 const Home = lazy(() => import("./pages/Home"));
@@ -38,14 +39,35 @@ const AppContent = () => {
       <Suspense fallback={<PageLoader />}>
         <Routes>
           <Route path="/register" element={<Register />} />
-          <Route path="/student/*" element={<StudentDashboard />} />
-          <Route path="/teacher/*" element={<TeacherDashboard />} />
+          <Route 
+            path="/student/*" 
+            element={
+              <ProtectedRoute allowedRoles={['student']}>
+                <StudentDashboard />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/teacher/*" 
+            element={
+              <ProtectedRoute allowedRoles={['teacher']}>
+                <TeacherDashboard />
+              </ProtectedRoute>
+            } 
+          />
           <Route path="/partner-application" element={<PartnerApplication />} />
           <Route path="/*" element={
             <Layout>
               <Suspense fallback={<PageLoader />}>
                 <Routes>
-                  <Route path="/" element={<Home />} />
+                  <Route 
+                    path="/" 
+                    element={
+                      <ProtectedRoute requireAuth={false}>
+                        <Home />
+                      </ProtectedRoute>
+                    } 
+                  />
                   <Route path="/about" element={<About />} />
                   <Route path="/courses" element={<Courses />} />
                   <Route path="/contact" element={<Contact />} />

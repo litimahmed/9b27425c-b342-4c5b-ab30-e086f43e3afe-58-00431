@@ -374,7 +374,15 @@ const Register = () => {
 
       // Clear localStorage after successful submission
       localStorage.removeItem('registration-uploaded-files');
-      navigate('/');
+      
+      // Redirect based on user type
+      if (pendingRegistrationData.user_type === 'student') {
+        navigate('/student');
+      } else if (pendingRegistrationData.user_type === 'teacher') {
+        navigate('/teacher');
+      } else {
+        navigate('/');
+      }
     } catch (error: any) {
       console.error('Final registration error:', error);
       toast({
