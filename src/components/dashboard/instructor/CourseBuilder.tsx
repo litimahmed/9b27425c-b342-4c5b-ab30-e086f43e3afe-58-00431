@@ -1,5 +1,8 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { ArrowLeft, ArrowRight, Check, Plus, Trash2, Eye, Upload, Settings, BookOpen, Video, FileText, Star, Clock, DollarSign, Users, Globe } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -70,6 +73,10 @@ const steps = [
 
 export function CourseBuilder() {
   const [currentStep, setCurrentStep] = useState(1);
+  const [isPublishing, setIsPublishing] = useState(false);
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
   const [courseData, setCourseData] = useState<CourseData>({
     basics: {
       title: "",
@@ -228,6 +235,175 @@ export function CourseBuilder() {
     }));
   };
 
+  const handleThumbnailSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("File size must be less than 5MB");
+        return;
+      }
+      setThumbnailFile(file);
+      updateCourseData("basics", { thumbnail: URL.createObjectURL(file) });
+      toast.success("Thumbnail selected");
+    }
+  };
+
+  const uploadThumbnail = async (): Promise<string | null> => {
+    if (!thumbnailFile) return courseData.basics.thumbnail || null;
+
+    try {
+      const fileExt = thumbnailFile.name.split('.').pop();
+      const fileName = `${Date.now()}.${fileExt}`;
+      const filePath = `course-thumbnails/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('registration-documents')
+        .upload(filePath, thumbnailFile);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('registration-documents')
+        .getPublicUrl(filePath);
+
+      return publicUrl;
+    } catch (error) {
+      console.error("Error uploading thumbnail:", error);
+      toast.error("Failed to upload thumbnail");
+      return null;
+    }
+  };
+
+  const publishCourse = async () => {
+    setIsPublishing(true);
+    try {
+      // Validate required fields
+      if (!courseData.basics.title) {
+        toast.error("Please enter a course title");
+        setIsPublishing(false);
+        return;
+      }
+
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast.error("You must be logged in to publish a course");
+        setIsPublishing(false);
+        return;
+      }
+
+      // Upload thumbnail if exists
+      const thumbnailUrl = await uploadThumbnail();
+
+      // Calculate total lessons and duration
+      const totalLessons = courseData.structure.sections.reduce(
+        (sum, section) => sum + section.lessons.length, 0
+      );
+      const totalDuration = courseData.structure.sections.reduce(
+        (sum, section) => sum + section.lessons.reduce(
+          (lessonSum, lesson) => lessonSum + (lesson.estimatedDuration || 0), 0
+        ), 0
+      );
+
+      // Insert course
+      const { data: course, error: courseError } = await supabase
+        .from('courses')
+        .insert({
+          teacher_id: user.id,
+          title: courseData.basics.title,
+          subtitle: courseData.basics.subtitle,
+          description: courseData.basics.description,
+          category: courseData.basics.category,
+          level: courseData.basics.level,
+          language: courseData.basics.language,
+          thumbnail_url: thumbnailUrl,
+          price: courseData.pricing.price,
+          promotional_price: courseData.pricing.promotionalPrice,
+          currency: courseData.pricing.currency,
+          free_preview: courseData.pricing.freePreview,
+          published: courseData.settings.published,
+          enrollment_limit: courseData.settings.enrollmentLimit,
+          certificate_enabled: courseData.settings.certificateEnabled,
+          total_lessons: totalLessons,
+          total_duration: totalDuration,
+        })
+        .select()
+        .single();
+
+      if (courseError) throw courseError;
+
+      // Insert sections and lessons
+      for (let sectionIndex = 0; sectionIndex < courseData.structure.sections.length; sectionIndex++) {
+        const section = courseData.structure.sections[sectionIndex];
+        
+        const { data: sectionData, error: sectionError } = await supabase
+          .from('course_sections')
+          .insert({
+            course_id: course.id,
+            title: section.title,
+            description: section.description,
+            order_index: sectionIndex,
+          })
+          .select()
+          .single();
+
+        if (sectionError) throw sectionError;
+
+        // Insert lessons for this section
+        for (let lessonIndex = 0; lessonIndex < section.lessons.length; lessonIndex++) {
+          const lesson = section.lessons[lessonIndex];
+          
+          const { data: lessonData, error: lessonError } = await supabase
+            .from('course_lessons')
+            .insert({
+              section_id: sectionData.id,
+              title: lesson.title,
+              description: lesson.description || '',
+              order_index: lessonIndex,
+              is_published: lesson.isPublished || false,
+              estimated_duration: lesson.estimatedDuration || 0,
+            })
+            .select()
+            .single();
+
+          if (lessonError) throw lessonError;
+
+          // Insert content items for this lesson
+          if (lesson.contentItems && lesson.contentItems.length > 0) {
+            for (let contentIndex = 0; contentIndex < lesson.contentItems.length; contentIndex++) {
+              const content = lesson.contentItems[contentIndex];
+              
+              const { error: contentError } = await supabase
+                .from('lesson_content')
+                .insert({
+                  lesson_id: lessonData.id,
+                  content_type: content.type,
+                  title: content.title,
+                  order_index: contentIndex,
+                  data: content.data || {},
+                });
+
+              if (contentError) throw contentError;
+            }
+          }
+        }
+      }
+
+      toast.success("Course published successfully!");
+      navigate("/dashboard/teacher");
+    } catch (error) {
+      console.error("Error publishing course:", error);
+      toast.error("Failed to publish course. Please try again.");
+    } finally {
+      setIsPublishing(false);
+    }
+  };
+
+  const saveDraft = async () => {
+    updateCourseData("settings", { published: false });
+    await publishCourse();
+  };
+
   const renderBasicsStep = () => (
     <div className="space-y-8">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -328,13 +504,36 @@ export function CourseBuilder() {
               <CardTitle>Course Thumbnail</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="border-2 border-dashed border-border rounded-lg p-8 text-center space-y-4">
-                <Upload className="w-12 h-12 text-muted-foreground mx-auto" />
-                <div>
-                  <p className="text-sm font-medium">Upload course thumbnail</p>
-                  <p className="text-xs text-muted-foreground">Recommended: 1280x720px</p>
-                </div>
-                <Button variant="outline" size="sm">Choose File</Button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleThumbnailSelect}
+                className="hidden"
+              />
+              <div 
+                onClick={() => fileInputRef.current?.click()}
+                className="border-2 border-dashed border-border rounded-lg p-8 text-center space-y-4 cursor-pointer hover:border-primary transition-colors"
+              >
+                {courseData.basics.thumbnail ? (
+                  <div className="space-y-4">
+                    <img 
+                      src={courseData.basics.thumbnail} 
+                      alt="Thumbnail preview" 
+                      className="w-full h-40 object-cover rounded-lg"
+                    />
+                    <p className="text-sm text-muted-foreground">Click to change</p>
+                  </div>
+                ) : (
+                  <>
+                    <Upload className="w-12 h-12 text-muted-foreground mx-auto" />
+                    <div>
+                      <p className="text-sm font-medium">Upload course thumbnail</p>
+                      <p className="text-xs text-muted-foreground">Recommended: 1280x720px (Max 5MB)</p>
+                    </div>
+                    <Button variant="outline" size="sm" type="button">Choose File</Button>
+                  </>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -719,11 +918,25 @@ export function CourseBuilder() {
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-4">
-              <Button size="lg" className="w-full bg-gradient-to-r from-primary to-accent text-white">
+              <Button 
+                size="lg" 
+                className="w-full bg-gradient-to-r from-primary to-accent text-white"
+                onClick={() => {
+                  updateCourseData("settings", { published: true });
+                  publishCourse();
+                }}
+                disabled={isPublishing}
+              >
                 <Globe className="w-5 h-5 mr-2" />
-                Publish Course
+                {isPublishing ? "Publishing..." : "Publish Course"}
               </Button>
-              <Button variant="outline" size="lg" className="w-full">
+              <Button 
+                variant="outline" 
+                size="lg" 
+                className="w-full"
+                onClick={saveDraft}
+                disabled={isPublishing}
+              >
                 <Eye className="w-5 h-5 mr-2" />
                 Save as Draft
               </Button>
@@ -820,15 +1033,26 @@ export function CourseBuilder() {
         </Button>
 
         <div className="flex items-center space-x-2">
-          <Button variant="outline">
+          <Button 
+            variant="outline"
+            onClick={saveDraft}
+            disabled={isPublishing}
+          >
             Save Draft
           </Button>
           <Button
-            onClick={nextStep}
-            disabled={currentStep === steps.length}
+            onClick={() => {
+              if (currentStep === steps.length) {
+                updateCourseData("settings", { published: true });
+                publishCourse();
+              } else {
+                nextStep();
+              }
+            }}
+            disabled={currentStep === steps.length ? isPublishing : false}
             className="flex items-center space-x-2 bg-gradient-to-r from-primary to-accent"
           >
-            <span>{currentStep === steps.length ? "Publish Course" : "Next"}</span>
+            <span>{currentStep === steps.length ? (isPublishing ? "Publishing..." : "Publish Course") : "Next"}</span>
             {currentStep < steps.length && <ArrowRight className="w-4 h-4" />}
           </Button>
         </div>
