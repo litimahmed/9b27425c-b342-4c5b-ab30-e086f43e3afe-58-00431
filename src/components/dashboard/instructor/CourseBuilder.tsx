@@ -257,13 +257,13 @@ export function CourseBuilder() {
       const filePath = `course-thumbnails/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
-        .from('registration-documents')
+        .from('course-assets')
         .upload(filePath, thumbnailFile);
 
       if (uploadError) throw uploadError;
 
       const { data: { publicUrl } } = supabase.storage
-        .from('registration-documents')
+        .from('course-assets')
         .getPublicUrl(filePath);
 
       return publicUrl;
@@ -280,6 +280,35 @@ export function CourseBuilder() {
       // Validate required fields
       if (!courseData.basics.title) {
         toast.error("Please enter a course title");
+        setCurrentStep(1);
+        setIsPublishing(false);
+        return;
+      }
+      
+      if (!courseData.basics.category) {
+        toast.error("Please select a category");
+        setCurrentStep(1);
+        setIsPublishing(false);
+        return;
+      }
+      
+      if (!courseData.basics.level) {
+        toast.error("Please select a difficulty level");
+        setCurrentStep(1);
+        setIsPublishing(false);
+        return;
+      }
+      
+      if (!courseData.basics.language) {
+        toast.error("Please select a language");
+        setCurrentStep(1);
+        setIsPublishing(false);
+        return;
+      }
+      
+      if (courseData.structure.sections.length === 0) {
+        toast.error("Please add at least one section to your course");
+        setCurrentStep(2);
         setIsPublishing(false);
         return;
       }
@@ -291,6 +320,8 @@ export function CourseBuilder() {
         setIsPublishing(false);
         return;
       }
+
+      toast.loading("Publishing your course...");
 
       // Upload thumbnail if exists
       const thumbnailUrl = await uploadThumbnail();
@@ -389,10 +420,12 @@ export function CourseBuilder() {
         }
       }
 
-      toast.success("Course published successfully!");
+      toast.dismiss();
+      toast.success(courseData.settings.published ? "Course published successfully!" : "Course saved as draft!");
       navigate("/dashboard/teacher");
     } catch (error) {
       console.error("Error publishing course:", error);
+      toast.dismiss();
       toast.error("Failed to publish course. Please try again.");
     } finally {
       setIsPublishing(false);
