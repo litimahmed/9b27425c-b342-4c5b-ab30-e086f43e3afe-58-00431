@@ -59,10 +59,11 @@ export default function AuthDialog({ onClose, isDark }: AuthDialogProps) {
       const { error } = await signIn(email, password);
 
       if (error) {
-        if (error.message.includes("Invalid login credentials")) {
-          setError("Incorrect email or password.");
+        const msg = String(error.message || '');
+        if (msg.toLowerCase().includes('invalid login credentials')) {
+          setError("Incorrect email or password. If you just signed up, confirm your email or disable 'Confirm email' in Supabase Auth settings.");
         } else {
-          setError(error.message || "An error occurred during login.");
+          setError(msg || "An error occurred during login.");
         }
       } else {
         onClose();

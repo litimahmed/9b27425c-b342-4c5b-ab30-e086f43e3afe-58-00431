@@ -357,11 +357,10 @@ const Register = () => {
         throw new Error('Utilisateur non authentifié après vérification.');
       }
 
-      // Insert profile data (not update since profile is created by trigger)
+      // Upsert profile data to ensure the row exists
       const { error } = await supabase
         .from('profiles')
-        .update({ ...pendingRegistrationData, status: 'pending' })
-        .eq('id', userId);
+        .upsert({ id: userId, ...pendingRegistrationData, status: 'pending' }, { onConflict: 'id' });
 
       if (error) {
         throw error;
