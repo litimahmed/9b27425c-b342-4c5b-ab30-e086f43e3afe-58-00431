@@ -423,10 +423,18 @@ export function CourseBuilder() {
       toast.dismiss();
       toast.success(courseData.settings.published ? "Course published successfully!" : "Course saved as draft!");
       navigate("/dashboard/teacher");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error publishing course:", error);
       toast.dismiss();
-      toast.error("Failed to publish course. Please try again.");
+      
+      // Show more detailed error message
+      const errorMessage = error?.message || "Failed to publish course. Please try again.";
+      toast.error(errorMessage);
+      
+      // If it's an RLS error, provide helpful guidance
+      if (errorMessage.includes("row-level security") || errorMessage.includes("permission denied")) {
+        toast.error("You don't have permission to create courses. Please ensure you have the teacher role assigned.");
+      }
     } finally {
       setIsPublishing(false);
     }
