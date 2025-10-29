@@ -442,7 +442,7 @@ export function CourseBuilder() {
 
       toast.dismiss();
       toast.success(courseData.settings.published ? "Course published successfully!" : "Course saved as draft!");
-      navigate("/dashboard/teacher");
+      navigate(`/course/${course.id}`);
     } catch (error: any) {
       console.error("Error publishing course:", error);
       toast.dismiss();

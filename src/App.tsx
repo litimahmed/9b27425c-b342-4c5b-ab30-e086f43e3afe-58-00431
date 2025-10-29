@@ -20,6 +20,7 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 const Home = lazy(() => import("./pages/Home"));
 const About = lazy(() => import("./pages/About"));
 const Courses = lazy(() => import("./pages/Courses"));
+const CourseView = lazy(() => import("./pages/CourseView"));
 const Contact = lazy(() => import("./pages/Contact"));
 const Register = lazy(() => import("./pages/Register"));
 const HelpCenter = lazy(() => import("./pages/HelpCenter"));
@@ -70,6 +71,7 @@ const AppContent = () => {
                   />
                   <Route path="/about" element={<About />} />
                   <Route path="/courses" element={<Courses />} />
+                  <Route path="/course/:courseId" element={<CourseView />} />
                   <Route path="/contact" element={<Contact />} />
                   <Route path="/help" element={<HelpCenter />} />
                   <Route path="/business" element={<Business />} />
