@@ -442,7 +442,15 @@ export function CourseBuilder() {
 
       toast.dismiss();
       toast.success(courseData.settings.published ? "Course published successfully!" : "Course saved as draft!");
-      navigate(`/course/${course.id}`);
+      
+      // Navigate to the course view page
+      if (course?.id) {
+        console.log("Navigating to course:", course.id);
+        navigate(`/course/${course.id}`);
+      } else {
+        console.error("Course ID is missing!");
+        toast.error("Course created but navigation failed");
+      }
     } catch (error: any) {
       console.error("Error publishing course:", error);
       toast.dismiss();
@@ -461,8 +469,17 @@ export function CourseBuilder() {
   };
 
   const saveDraft = async () => {
-    updateCourseData("settings", { published: false });
-    await publishCourse();
+    // Set published to false before saving
+    const originalPublished = courseData.settings.published;
+    setCourseData(prev => ({
+      ...prev,
+      settings: { ...prev.settings, published: false }
+    }));
+    
+    // Wait a tick for state to update
+    setTimeout(async () => {
+      await publishCourse();
+    }, 0);
   };
 
   const renderBasicsStep = () => (
