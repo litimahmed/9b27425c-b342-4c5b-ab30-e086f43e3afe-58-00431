@@ -71,7 +71,7 @@ const AppContent = () => {
                   />
                   <Route path="/about" element={<About />} />
                   <Route path="/courses" element={<Courses />} />
-                  <Route path="/course/:courseId" element={<CourseView />} />
+                  <Route path="/course/:slug" element={<CourseView />} />
                   <Route path="/contact" element={<Contact />} />
                   <Route path="/help" element={<HelpCenter />} />
                   <Route path="/business" element={<Business />} />

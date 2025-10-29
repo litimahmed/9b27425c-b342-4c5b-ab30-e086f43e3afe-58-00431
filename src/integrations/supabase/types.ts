@@ -111,6 +111,7 @@ export type Database = {
           price: number | null
           promotional_price: number | null
           published: boolean | null
+          slug: string | null
           subtitle: string | null
           teacher_id: string
           thumbnail_url: string | null
@@ -133,6 +134,7 @@ export type Database = {
           price?: number | null
           promotional_price?: number | null
           published?: boolean | null
+          slug?: string | null
           subtitle?: string | null
           teacher_id: string
           thumbnail_url?: string | null
@@ -155,6 +157,7 @@ export type Database = {
           price?: number | null
           promotional_price?: number | null
           published?: boolean | null
+          slug?: string | null
           subtitle?: string | null
           teacher_id?: string
           thumbnail_url?: string | null
@@ -304,6 +307,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      generate_slug: { Args: { title: string }; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

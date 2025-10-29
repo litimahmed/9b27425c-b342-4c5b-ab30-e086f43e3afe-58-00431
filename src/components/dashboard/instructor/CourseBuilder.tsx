@@ -357,6 +357,17 @@ export function CourseBuilder() {
       );
 
       // Insert course
+      // Generate slug from title
+      const generateSlug = (title: string) => {
+        return title
+          .toLowerCase()
+          .replace(/[^a-z0-9\s]/g, '')
+          .replace(/\s+/g, '_')
+          .trim();
+      };
+
+      const slug = generateSlug(courseData.basics.title);
+
       const { data: course, error: courseError } = await supabase
         .from('courses')
         .insert({
@@ -377,6 +388,7 @@ export function CourseBuilder() {
           certificate_enabled: courseData.settings.certificateEnabled,
           total_lessons: totalLessons,
           total_duration: totalDuration,
+          slug: slug,
         })
         .select()
         .single();
@@ -443,12 +455,12 @@ export function CourseBuilder() {
       toast.dismiss();
       toast.success(courseData.settings.published ? "Course published successfully!" : "Course saved as draft!");
       
-      // Navigate to the course view page
-      if (course?.id) {
-        console.log("Navigating to course:", course.id);
-        navigate(`/course/${course.id}`);
+      // Navigate to the course view page using slug
+      if (course?.slug) {
+        console.log("Navigating to course:", course.slug);
+        navigate(`/course/${course.slug}`);
       } else {
-        console.error("Course ID is missing!");
+        console.error("Course slug is missing!");
         toast.error("Course created but navigation failed");
       }
     } catch (error: any) {

@@ -73,26 +73,26 @@ interface ContentItem {
 }
 
 export default function CourseView() {
-  const { courseId } = useParams<{ courseId: string }>();
+  const { slug } = useParams<{ slug: string }>();
   const [course, setCourse] = useState<Course | null>(null);
   const [sections, setSections] = useState<Section[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (courseId) {
+    if (slug) {
       fetchCourseData();
     }
-  }, [courseId]);
+  }, [slug]);
 
   const fetchCourseData = async () => {
     try {
       setLoading(true);
 
-      // Fetch course
+      // Fetch course by slug
       const { data: courseData, error: courseError } = await supabase
         .from("courses")
         .select("*")
-        .eq("id", courseId)
+        .eq("slug", slug)
         .maybeSingle();
 
       if (courseError) throw courseError;
@@ -110,7 +110,7 @@ export default function CourseView() {
       const { data: sectionsData, error: sectionsError } = await supabase
         .from("course_sections")
         .select("*")
-        .eq("course_id", courseId)
+        .eq("course_id", courseData.id)
         .order("order_index");
 
       if (sectionsError) throw sectionsError;
