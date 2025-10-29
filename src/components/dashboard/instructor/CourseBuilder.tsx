@@ -291,7 +291,7 @@ export function CourseBuilder() {
     }
   };
 
-  const publishCourse = async () => {
+  const publishCourse = async (makePublished: boolean) => {
     setIsPublishing(true);
     try {
       // Validate required fields
@@ -383,7 +383,7 @@ export function CourseBuilder() {
           promotional_price: courseData.pricing.promotionalPrice,
           currency: courseData.pricing.currency,
           free_preview: courseData.pricing.freePreview,
-          published: courseData.settings.published,
+          published: makePublished,
           enrollment_limit: courseData.settings.enrollmentLimit,
           certificate_enabled: courseData.settings.certificateEnabled,
           total_lessons: totalLessons,
@@ -453,7 +453,7 @@ export function CourseBuilder() {
       }
 
       toast.dismiss();
-      toast.success(courseData.settings.published ? "Course published successfully!" : "Course saved as draft!");
+      toast.success(makePublished ? "Course published successfully!" : "Course saved as draft!");
       
       // Navigate to the course view page using slug
       console.log("Course object:", course);
@@ -485,17 +485,7 @@ export function CourseBuilder() {
   };
 
   const saveDraft = async () => {
-    // Set published to false before saving
-    const originalPublished = courseData.settings.published;
-    setCourseData(prev => ({
-      ...prev,
-      settings: { ...prev.settings, published: false }
-    }));
-    
-    // Wait a tick for state to update
-    setTimeout(async () => {
-      await publishCourse();
-    }, 0);
+    await publishCourse(false);
   };
 
   const renderBasicsStep = () => (
@@ -1015,10 +1005,7 @@ export function CourseBuilder() {
               <Button 
                 size="lg" 
                 className="w-full bg-gradient-to-r from-primary to-accent text-white"
-                onClick={() => {
-                  updateCourseData("settings", { published: true });
-                  publishCourse();
-                }}
+                onClick={() => publishCourse(true)}
                 disabled={isPublishing}
               >
                 <Globe className="w-5 h-5 mr-2" />
@@ -1129,7 +1116,7 @@ export function CourseBuilder() {
         <div className="flex items-center space-x-2">
           <Button 
             variant="outline"
-            onClick={saveDraft}
+            onClick={() => saveDraft()}
             disabled={isPublishing}
           >
             Save Draft
@@ -1137,8 +1124,7 @@ export function CourseBuilder() {
           <Button
             onClick={() => {
               if (currentStep === steps.length) {
-                updateCourseData("settings", { published: true });
-                publishCourse();
+                publishCourse(true);
               } else {
                 nextStep();
               }
