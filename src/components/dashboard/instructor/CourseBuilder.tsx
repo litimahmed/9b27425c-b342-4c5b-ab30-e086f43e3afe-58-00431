@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { ArrowLeft, ArrowRight, Check, Plus, Trash2, Eye, Upload, Settings, BookOpen, Video, FileText, Star, Clock, DollarSign, Users, Globe } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Plus, Trash2, Eye, Upload, Settings, BookOpen, Video, FileText, Star, Clock, DollarSign, Users, Globe, Sparkles, Zap, Target, TrendingUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
@@ -75,6 +75,7 @@ export function CourseBuilder() {
   const [currentStep, setCurrentStep] = useState(1);
   const [isPublishing, setIsPublishing] = useState(false);
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const [hoveredStep, setHoveredStep] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const [courseData, setCourseData] = useState<CourseData>({
@@ -489,54 +490,68 @@ export function CourseBuilder() {
   };
 
   const renderBasicsStep = () => (
-    <div className="space-y-8">
+    <div className="space-y-8 animate-fade-in">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Main Content Area */}
         <div className="lg:col-span-2 space-y-6">
-          <Card>
+          <Card className="border-0 shadow-xl bg-card/70 backdrop-blur-xl overflow-hidden group hover:shadow-2xl transition-all duration-500">
+            {/* Gradient Header */}
+            <div className="h-2 bg-gradient-to-r from-primary via-accent to-primary" />
             <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <BookOpen className="w-5 h-5 text-primary" />
-                <span>Course Information</span>
+              <CardTitle className="flex items-center gap-3 text-2xl">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <BookOpen className="w-6 h-6 text-primary" />
+                </div>
+                <span className="bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text">Course Information</span>
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="title">Course Title *</Label>
+            <CardContent className="space-y-8 p-8">
+              <div className="space-y-3">
+                <Label htmlFor="title" className="text-base font-semibold flex items-center gap-2">
+                  Course Title <span className="text-destructive">*</span>
+                  <Sparkles className="w-4 h-4 text-primary animate-pulse" />
+                </Label>
                 <Input
                   id="title"
                   placeholder="e.g., Complete React Development Course 2024"
                   value={courseData.basics.title}
                   onChange={(e) => updateCourseData("basics", { title: e.target.value })}
-                  className="text-lg"
+                  className="text-lg h-14 border-2 focus:border-primary transition-all duration-300 bg-background/50"
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="subtitle">Course Subtitle</Label>
+              <div className="space-y-3">
+                <Label htmlFor="subtitle" className="text-base font-semibold">Course Subtitle</Label>
                 <Input
                   id="subtitle"
                   placeholder="A brief, compelling subtitle that explains what students will learn"
                   value={courseData.basics.subtitle}
                   onChange={(e) => updateCourseData("basics", { subtitle: e.target.value })}
+                  className="h-12 border-2 focus:border-primary transition-all duration-300 bg-background/50"
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="description">Course Description *</Label>
+              <div className="space-y-3">
+                <Label htmlFor="description" className="text-base font-semibold flex items-center gap-2">
+                  Course Description <span className="text-destructive">*</span>
+                </Label>
                 <Textarea
                   id="description"
                   placeholder="Describe what students will learn, prerequisites, and outcomes..."
                   value={courseData.basics.description}
                   onChange={(e) => updateCourseData("basics", { description: e.target.value })}
-                  rows={6}
+                  rows={7}
+                  className="border-2 focus:border-primary transition-all duration-300 resize-none bg-background/50"
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="category">Category *</Label>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="space-y-3">
+                  <Label htmlFor="category" className="text-base font-semibold flex items-center gap-2">
+                    Category <span className="text-destructive">*</span>
+                  </Label>
                   <Select value={courseData.basics.category} onValueChange={(value) => updateCourseData("basics", { category: value })}>
-                    <SelectTrigger>
+                    <SelectTrigger className="h-12 border-2 focus:border-primary transition-all bg-background/50">
                       <SelectValue placeholder="Select category" />
                     </SelectTrigger>
                     <SelectContent>
@@ -549,10 +564,12 @@ export function CourseBuilder() {
                   </Select>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="level">Difficulty Level *</Label>
+                <div className="space-y-3">
+                  <Label htmlFor="level" className="text-base font-semibold flex items-center gap-2">
+                    Level <span className="text-destructive">*</span>
+                  </Label>
                   <Select value={courseData.basics.level} onValueChange={(value) => updateCourseData("basics", { level: value })}>
-                    <SelectTrigger>
+                    <SelectTrigger className="h-12 border-2 focus:border-primary transition-all bg-background/50">
                       <SelectValue placeholder="Select level" />
                     </SelectTrigger>
                     <SelectContent>
@@ -563,10 +580,12 @@ export function CourseBuilder() {
                   </Select>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="language">Language *</Label>
+                <div className="space-y-3">
+                  <Label htmlFor="language" className="text-base font-semibold flex items-center gap-2">
+                    Language <span className="text-destructive">*</span>
+                  </Label>
                   <Select value={courseData.basics.language} onValueChange={(value) => updateCourseData("basics", { language: value })}>
-                    <SelectTrigger>
+                    <SelectTrigger className="h-12 border-2 focus:border-primary transition-all bg-background/50">
                       <SelectValue placeholder="Select language" />
                     </SelectTrigger>
                     <SelectContent>
@@ -582,10 +601,16 @@ export function CourseBuilder() {
           </Card>
         </div>
 
+        {/* Sidebar */}
         <div className="space-y-6">
-          <Card>
+          {/* Thumbnail Upload */}
+          <Card className="border-0 shadow-xl bg-card/70 backdrop-blur-xl overflow-hidden hover:shadow-2xl transition-all duration-500">
+            <div className="h-2 bg-gradient-to-r from-accent via-primary to-accent" />
             <CardHeader>
-              <CardTitle>Course Thumbnail</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <Upload className="w-5 h-5 text-accent" />
+                Course Thumbnail
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <input
@@ -597,47 +622,59 @@ export function CourseBuilder() {
               />
               <div 
                 onClick={() => fileInputRef.current?.click()}
-                className="border-2 border-dashed border-border rounded-lg p-8 text-center space-y-4 cursor-pointer hover:border-primary transition-colors"
+                className="relative border-2 border-dashed border-primary/30 rounded-2xl p-8 text-center space-y-4 cursor-pointer hover:border-primary hover:bg-primary/5 transition-all duration-300 group overflow-hidden"
               >
+                {/* Animated background effect */}
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                
                 {courseData.basics.thumbnail ? (
-                  <div className="space-y-4">
+                  <div className="relative space-y-4 z-10">
                     <img 
                       src={courseData.basics.thumbnail} 
                       alt="Thumbnail preview" 
-                      className="w-full h-40 object-cover rounded-lg"
+                      className="w-full h-48 object-cover rounded-xl shadow-lg group-hover:scale-105 transition-transform duration-500"
                     />
-                    <p className="text-sm text-muted-foreground">Click to change</p>
+                    <p className="text-sm font-medium text-muted-foreground group-hover:text-primary transition-colors">
+                      Click to change image
+                    </p>
                   </div>
                 ) : (
-                  <>
-                    <Upload className="w-12 h-12 text-muted-foreground mx-auto" />
+                  <div className="relative z-10 space-y-4">
+                    <Upload className="w-16 h-16 text-muted-foreground mx-auto group-hover:text-primary group-hover:scale-110 transition-all duration-300" />
                     <div>
-                      <p className="text-sm font-medium">Upload course thumbnail</p>
+                      <p className="text-base font-semibold text-foreground mb-2">Upload course thumbnail</p>
                       <p className="text-xs text-muted-foreground">Recommended: 1280x720px (Max 5MB)</p>
                     </div>
-                    <Button variant="outline" size="sm" type="button">Choose File</Button>
-                  </>
+                    <Button variant="outline" size="lg" type="button" className="border-primary/30 hover:bg-primary hover:text-primary-foreground">
+                      Choose File
+                    </Button>
+                  </div>
                 )}
               </div>
             </CardContent>
           </Card>
 
-          <Card>
+          {/* Success Tips Card */}
+          <Card className="border-0 shadow-xl bg-gradient-to-br from-primary/10 via-accent/5 to-primary/5 backdrop-blur-xl overflow-hidden">
+            <div className="h-2 bg-gradient-to-r from-primary via-accent to-primary" />
             <CardHeader>
-              <CardTitle>Tips for Success</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-primary" />
+                Tips for Success
+              </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex items-start space-x-3">
-                <div className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0" />
-                <p className="text-sm text-muted-foreground">Use a clear, descriptive title that includes your main topic</p>
+            <CardContent className="space-y-4">
+              <div className="flex items-start gap-4 p-3 rounded-xl bg-background/50 hover:bg-background/70 transition-all duration-300 group">
+                <div className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0 group-hover:scale-150 transition-transform" />
+                <p className="text-sm text-foreground leading-relaxed">Use a clear, descriptive title that includes your main topic</p>
               </div>
-              <div className="flex items-start space-x-3">
-                <div className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0" />
-                <p className="text-sm text-muted-foreground">Write a compelling description that explains the value students will get</p>
+              <div className="flex items-start gap-4 p-3 rounded-xl bg-background/50 hover:bg-background/70 transition-all duration-300 group">
+                <div className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0 group-hover:scale-150 transition-transform" />
+                <p className="text-sm text-foreground leading-relaxed">Write a compelling description that explains the value students will get</p>
               </div>
-              <div className="flex items-start space-x-3">
-                <div className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0" />
-                <p className="text-sm text-muted-foreground">Choose the most specific category that fits your course</p>
+              <div className="flex items-start gap-4 p-3 rounded-xl bg-background/50 hover:bg-background/70 transition-all duration-300 group">
+                <div className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0 group-hover:scale-150 transition-transform" />
+                <p className="text-sm text-foreground leading-relaxed">Choose the most specific category that fits your course</p>
               </div>
             </CardContent>
           </Card>
@@ -1044,97 +1081,256 @@ export function CourseBuilder() {
   };
 
   return (
-    <div className="space-y-12 max-w-7xl mx-auto">
-      {/* Elegant Header */}
-      <div className="border border-border/50 rounded-3xl bg-card/50 backdrop-blur-sm">
-        <div className="p-12">
-          <div className="flex items-start justify-between mb-10">
-            <div className="space-y-3">
-              <h1 className="text-5xl font-light tracking-tight text-foreground">Course Builder</h1>
-              <p className="text-xl text-muted-foreground font-light">Craft exceptional learning experiences</p>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Badge variant="outline" className="px-4 py-2 text-sm font-medium border-border/50">
-                Step {currentStep} of {steps.length}
-              </Badge>
-            </div>
-          </div>
+    <div className="min-h-screen bg-gradient-to-br from-background via-primary/[0.02] to-accent/[0.03] relative overflow-hidden">
+      {/* Animated Background Blobs */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-float" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
+      </div>
 
-          {/* Elegant Progress Steps */}
-          <div className="relative">
-            <div className="absolute top-6 left-6 right-6 h-px bg-border/30" />
-            <Progress value={getStepProgress()} className="h-1 mb-12 bg-border/20" />
+      <div className="relative container-custom py-8 max-w-[1400px]">
+        {/* Modern Floating Header with Glassmorphism */}
+        <div className="mb-8 animate-fade-in">
+          <Button
+            variant="ghost"
+            onClick={() => navigate("/instructor/courses")}
+            className="mb-6 hover:bg-primary/5 group transition-all"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
+            Back to My Courses
+          </Button>
+          
+          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 bg-card/50 backdrop-blur-xl border border-border/50 rounded-3xl p-8 shadow-xl">
+            <div className="space-y-2">
+              <h1 className="text-5xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+                Create Your Course
+              </h1>
+              <p className="text-lg text-muted-foreground flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-primary animate-pulse" />
+                Build something amazing that students will love
+              </p>
+            </div>
             
-            <div className="flex justify-between relative">
-              {steps.map((step, index) => {
-                const StepIcon = step.icon;
-                const isActive = currentStep === step.id;
-                const isCompleted = currentStep > step.id;
-                
-                return (
-                  <div key={step.id} className="flex flex-col items-center space-y-4 relative">
-                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center border transition-all duration-300 ${
-                      isCompleted ? "bg-primary border-primary text-white shadow-lg shadow-primary/25" :
-                      isActive ? "bg-background border-primary text-primary shadow-lg shadow-primary/10" :
-                      "bg-background border-border/50 text-muted-foreground hover:border-border"
-                    }`}>
-                      {isCompleted ? <Check className="w-6 h-6" /> : <StepIcon className="w-6 h-6" />}
-                    </div>
-                    <div className="text-center max-w-32">
-                      <p className={`text-sm font-medium leading-tight ${isActive ? "text-foreground" : "text-muted-foreground"}`}>
-                        {step.name}
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-1 leading-relaxed hidden sm:block">
-                        {step.description}
-                      </p>
-                    </div>
+            {/* Stats Pills */}
+            <div className="flex gap-3">
+              <div className="bg-gradient-to-br from-primary/10 to-accent/10 backdrop-blur-sm border border-primary/20 rounded-2xl px-6 py-4 shadow-lg">
+                <div className="flex items-center gap-3">
+                  <Target className="w-5 h-5 text-primary" />
+                  <div>
+                    <div className="text-2xl font-bold text-primary">{currentStep}/{steps.length}</div>
+                    <div className="text-xs text-muted-foreground">Steps</div>
                   </div>
-                );
-              })}
+                </div>
+              </div>
+              <div className="bg-gradient-to-br from-accent/10 to-primary/10 backdrop-blur-sm border border-accent/20 rounded-2xl px-6 py-4 shadow-lg">
+                <div className="flex items-center gap-3">
+                  <TrendingUp className="w-5 h-5 text-accent" />
+                  <div>
+                    <div className="text-2xl font-bold text-accent">{Math.round(getStepProgress())}%</div>
+                    <div className="text-xs text-muted-foreground">Complete</div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Step Content */}
-      <div className="min-h-96">
-        {renderStepContent()}
-      </div>
+        {/* Ultra-Modern Interactive Progress Steps */}
+        <Card className="mb-10 overflow-hidden border-0 shadow-2xl bg-card/70 backdrop-blur-2xl animate-fade-in">
+          <CardContent className="p-10">
+            <div className="relative">
+              {/* Animated Gradient Progress Background */}
+              <div className="absolute top-12 left-12 right-12 h-3 bg-gradient-to-r from-muted/50 via-muted to-muted/50 rounded-full overflow-hidden backdrop-blur-sm">
+                <div 
+                  className="h-full bg-gradient-to-r from-primary via-accent to-primary rounded-full transition-all duration-1000 ease-out relative overflow-hidden"
+                  style={{ width: `${getStepProgress()}%` }}
+                >
+                  {/* Shimmer effect */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full animate-shimmer" style={{ animationDuration: '2s' }} />
+                  {/* Glow effect */}
+                  <div className="absolute inset-0 bg-white/20 blur-xl" />
+                </div>
+              </div>
 
-      {/* Navigation */}
-      <div className="flex items-center justify-between border-t border-border pt-6">
-        <Button
-          variant="outline"
-          onClick={prevStep}
-          disabled={currentStep === 1}
-          className="flex items-center space-x-2"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <span>Previous</span>
-        </Button>
+              {/* Interactive Step Indicators */}
+              <div className="relative flex justify-between">
+                {steps.map((step) => {
+                  const StepIcon = step.icon;
+                  const isCompleted = currentStep > step.id;
+                  const isCurrent = currentStep === step.id;
+                  const isHovered = hoveredStep === step.id;
+                  
+                  return (
+                    <div 
+                      key={step.id} 
+                      className="flex flex-col items-center cursor-pointer group relative z-10"
+                      onClick={() => setCurrentStep(step.id)}
+                      onMouseEnter={() => setHoveredStep(step.id)}
+                      onMouseLeave={() => setHoveredStep(null)}
+                    >
+                      {/* Animated pulse ring for current step */}
+                      {isCurrent && (
+                        <>
+                          <div className="absolute top-0 w-24 h-24 rounded-full bg-primary/20 animate-ping" />
+                          <div className="absolute top-0 w-24 h-24 rounded-full bg-accent/10 animate-pulse" />
+                        </>
+                      )}
+                      
+                      {/* Step Icon Container */}
+                      <div 
+                        className={`
+                          relative w-24 h-24 rounded-3xl flex items-center justify-center mb-5 transition-all duration-500 transform
+                          ${isCompleted ? 'bg-gradient-to-br from-primary via-primary to-accent text-primary-foreground shadow-2xl shadow-primary/40 scale-100 rotate-0' : ''}
+                          ${isCurrent ? 'bg-gradient-to-br from-primary via-accent to-primary text-primary-foreground shadow-2xl shadow-primary/60 scale-110 -rotate-3' : ''}
+                          ${!isCompleted && !isCurrent ? 'bg-gradient-to-br from-muted/80 to-muted text-muted-foreground group-hover:from-muted group-hover:to-muted/80 group-hover:scale-105 group-hover:shadow-xl' : ''}
+                          ${isHovered && !isCurrent && !isCompleted ? 'scale-105 shadow-xl' : ''}
+                        `}
+                      >
+                        {/* Inner glow */}
+                        {(isCurrent || isCompleted) && (
+                          <div className="absolute inset-2 bg-white/10 rounded-2xl blur-xl" />
+                        )}
+                        
+                        {/* Icon */}
+                        {isCompleted ? (
+                          <div className="relative animate-scale-in">
+                            <Check className="w-9 h-9 drop-shadow-lg" strokeWidth={3} />
+                            <div className="absolute inset-0 bg-white/30 rounded-full blur-2xl animate-pulse" />
+                          </div>
+                        ) : (
+                          <StepIcon className={`w-9 h-9 ${isCurrent ? 'drop-shadow-lg' : ''}`} strokeWidth={isCurrent ? 2.5 : 2} />
+                        )}
+                        
+                        {/* Step Number Badge */}
+                        <div className={`
+                          absolute -top-2 -right-2 w-8 h-8 rounded-xl flex items-center justify-center text-xs font-bold shadow-lg transition-all duration-300
+                          ${isCurrent ? 'bg-gradient-to-br from-accent to-primary text-primary-foreground scale-110' : 'bg-background text-muted-foreground border-2 border-border'}
+                        `}>
+                          {step.id}
+                        </div>
 
-        <div className="flex items-center space-x-2">
-          <Button 
-            variant="outline"
-            onClick={() => saveDraft()}
-            disabled={isPublishing}
-          >
-            Save Draft
-          </Button>
-          <Button
-            onClick={() => {
-              if (currentStep === steps.length) {
-                publishCourse(true);
-              } else {
-                nextStep();
-              }
-            }}
-            disabled={currentStep === steps.length ? isPublishing : false}
-            className="flex items-center space-x-2 bg-gradient-to-r from-primary to-accent"
-          >
-            <span>{currentStep === steps.length ? (isPublishing ? "Publishing..." : "Publish Course") : "Next"}</span>
-            {currentStep < steps.length && <ArrowRight className="w-4 h-4" />}
-          </Button>
+                        {/* Completion Checkmark Badge */}
+                        {isCompleted && (
+                          <div className="absolute -bottom-2 -right-2 w-7 h-7 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center shadow-lg animate-scale-in">
+                            <Check className="w-4 h-4 text-white" strokeWidth={3} />
+                          </div>
+                        )}
+                      </div>
+                      
+                      {/* Step Info */}
+                      <div className="text-center max-w-[160px]">
+                        <p className={`
+                          text-sm font-bold mb-1 transition-all duration-300
+                          ${isCurrent ? 'text-primary scale-105' : 'text-foreground'}
+                          ${isHovered && !isCurrent ? 'text-primary scale-105' : ''}
+                        `}>
+                          {step.name}
+                        </p>
+                        <p className={`
+                          text-xs transition-colors hidden md:block leading-relaxed
+                          ${isCurrent ? 'text-primary/80 font-medium' : 'text-muted-foreground'}
+                        `}>
+                          {step.description}
+                        </p>
+                      </div>
+
+                      {/* Interactive Hover Tooltip */}
+                      {isHovered && !isCurrent && (
+                        <div className="absolute -bottom-10 bg-popover/95 backdrop-blur-sm text-popover-foreground px-4 py-2 rounded-xl text-xs font-medium shadow-2xl border border-border animate-fade-in z-50">
+                          <div className="flex items-center gap-2">
+                            <Zap className="w-3 h-3" />
+                            Jump to this step
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Step Content with Smooth Animation */}
+        <div className="mb-32 animate-fade-in">
+          {renderStepContent()}
+        </div>
+
+        {/* Ultra-Modern Floating Action Bar */}
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 w-full max-w-3xl px-4 animate-slide-up">
+          <Card className="border-0 shadow-2xl bg-card/95 backdrop-blur-2xl overflow-hidden">
+            {/* Animated gradient border effect */}
+            <div className="absolute inset-0 bg-gradient-to-r from-primary via-accent to-primary opacity-20 blur-xl" />
+            
+            <CardContent className="relative p-6">
+              <div className="flex items-center gap-4">
+                {/* Previous Button */}
+                {currentStep > 1 && (
+                  <Button 
+                    variant="outline"
+                    onClick={prevStep}
+                    disabled={isPublishing}
+                    className="group hover:bg-primary/5 hover:border-primary/30 transition-all"
+                  >
+                    <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
+                    <span className="hidden sm:inline">Back</span>
+                  </Button>
+                )}
+
+                {/* Save Draft Button */}
+                <Button 
+                  variant="ghost"
+                  onClick={() => saveDraft()}
+                  disabled={isPublishing}
+                  className="hover:bg-primary/5 flex items-center gap-2 transition-all"
+                >
+                  <Clock className="w-4 h-4" />
+                  <span className="hidden sm:inline">Save Draft</span>
+                </Button>
+
+                {/* Main CTA Button */}
+                <Button
+                  onClick={() => {
+                    if (currentStep === steps.length) {
+                      publishCourse(true);
+                    } else {
+                      nextStep();
+                    }
+                  }}
+                  disabled={isPublishing}
+                  className="flex-1 bg-gradient-to-r from-primary via-accent to-primary text-primary-foreground hover:shadow-2xl hover:shadow-primary/40 transition-all duration-500 group relative overflow-hidden h-14"
+                  size="lg"
+                >
+                  {/* Animated shimmer effect */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                  
+                  <div className="relative flex items-center justify-center gap-2">
+                    {currentStep === steps.length ? (
+                      <>
+                        {isPublishing ? (
+                          <>
+                            <div className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+                            <span className="font-semibold">Publishing Your Course...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Zap className="w-5 h-5 animate-pulse" />
+                            <span className="font-bold text-lg">Publish Course</span>
+                            <Sparkles className="w-5 h-5 animate-pulse" />
+                          </>
+                        )}
+                      </>
+                    ) : (
+                      <>
+                        <span className="font-semibold">Continue to {steps[currentStep]?.name}</span>
+                        <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                      </>
+                    )}
+                  </div>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>
