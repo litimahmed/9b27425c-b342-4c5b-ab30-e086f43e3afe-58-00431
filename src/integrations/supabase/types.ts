@@ -111,7 +111,7 @@ export type Database = {
           price: number | null
           promotional_price: number | null
           published: boolean | null
-          slug: string | null
+          slug: string
           subtitle: string | null
           teacher_id: string
           thumbnail_url: string | null
@@ -134,7 +134,7 @@ export type Database = {
           price?: number | null
           promotional_price?: number | null
           published?: boolean | null
-          slug?: string | null
+          slug: string
           subtitle?: string | null
           teacher_id: string
           thumbnail_url?: string | null
@@ -157,7 +157,7 @@ export type Database = {
           price?: number | null
           promotional_price?: number | null
           published?: boolean | null
-          slug?: string | null
+          slug?: string
           subtitle?: string | null
           teacher_id?: string
           thumbnail_url?: string | null

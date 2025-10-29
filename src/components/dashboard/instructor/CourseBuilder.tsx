@@ -456,12 +456,16 @@ export function CourseBuilder() {
       toast.success(courseData.settings.published ? "Course published successfully!" : "Course saved as draft!");
       
       // Navigate to the course view page using slug
+      console.log("Course object:", course);
+      console.log("Course slug:", course?.slug);
+      
       if (course?.slug) {
-        console.log("Navigating to course:", course.slug);
-        navigate(`/course/${course.slug}`);
+        console.log("Navigating to course with slug:", course.slug);
+        // Use replace to avoid navigation issues and ensure immediate redirect
+        navigate(`/course/${course.slug}`, { replace: true });
       } else {
-        console.error("Course slug is missing!");
-        toast.error("Course created but navigation failed");
+        console.error("Course slug is missing! Full course object:", course);
+        toast.error("Course created but slug is missing. Please refresh and try again.");
       }
     } catch (error: any) {
       console.error("Error publishing course:", error);
