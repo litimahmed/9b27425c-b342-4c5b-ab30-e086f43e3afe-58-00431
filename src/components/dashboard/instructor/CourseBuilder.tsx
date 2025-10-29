@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { ArrowLeft, ArrowRight, Check, Plus, Trash2, Eye, Upload, Settings, BookOpen, Video, FileText, Star, Clock, DollarSign, Users, Globe, Sparkles, Zap, Target, TrendingUp } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Plus, Trash2, Eye, Upload, Settings, BookOpen, Video, FileText, Clock, DollarSign, Users, Globe } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
@@ -494,22 +494,19 @@ export function CourseBuilder() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main Content Area */}
         <div className="lg:col-span-2 space-y-6">
-          <Card className="border-0 shadow-xl bg-card/70 backdrop-blur-xl overflow-hidden group hover:shadow-2xl transition-all duration-500">
-            {/* Gradient Header */}
-            <div className="h-2 bg-gradient-to-r from-primary via-accent to-primary" />
+            <Card className="border-0 shadow-xl bg-card/70 backdrop-blur-xl overflow-hidden">
             <CardHeader>
               <CardTitle className="flex items-center gap-3 text-2xl">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">
                   <BookOpen className="w-6 h-6 text-primary" />
                 </div>
-                <span className="bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text">Course Information</span>
+                <span>Course Information</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-8 p-8">
               <div className="space-y-3">
                 <Label htmlFor="title" className="text-base font-semibold flex items-center gap-2">
                   Course Title <span className="text-destructive">*</span>
-                  <Sparkles className="w-4 h-4 text-primary animate-pulse" />
                 </Label>
                 <Input
                   id="title"
@@ -604,11 +601,10 @@ export function CourseBuilder() {
         {/* Sidebar */}
         <div className="space-y-6">
           {/* Thumbnail Upload */}
-          <Card className="border-0 shadow-xl bg-card/70 backdrop-blur-xl overflow-hidden hover:shadow-2xl transition-all duration-500">
-            <div className="h-2 bg-gradient-to-r from-accent via-primary to-accent" />
+          <Card className="border-0 shadow-xl bg-card/70 backdrop-blur-xl overflow-hidden">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Upload className="w-5 h-5 text-accent" />
+                <Upload className="w-5 h-5 text-primary" />
                 Course Thumbnail
               </CardTitle>
             </CardHeader>
@@ -622,10 +618,8 @@ export function CourseBuilder() {
               />
               <div 
                 onClick={() => fileInputRef.current?.click()}
-                className="relative border-2 border-dashed border-primary/30 rounded-2xl p-8 text-center space-y-4 cursor-pointer hover:border-primary hover:bg-primary/5 transition-all duration-300 group overflow-hidden"
+                className="relative border-2 border-dashed border-primary/30 rounded-2xl p-8 text-center space-y-4 cursor-pointer hover:border-primary hover:bg-primary/5 transition-all group"
               >
-                {/* Animated background effect */}
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 
                 {courseData.basics.thumbnail ? (
                   <div className="relative space-y-4 z-10">
@@ -654,30 +648,6 @@ export function CourseBuilder() {
             </CardContent>
           </Card>
 
-          {/* Success Tips Card */}
-          <Card className="border-0 shadow-xl bg-gradient-to-br from-primary/10 via-accent/5 to-primary/5 backdrop-blur-xl overflow-hidden">
-            <div className="h-2 bg-gradient-to-r from-primary via-accent to-primary" />
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-primary" />
-                Tips for Success
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-start gap-4 p-3 rounded-xl bg-background/50 hover:bg-background/70 transition-all duration-300 group">
-                <div className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0 group-hover:scale-150 transition-transform" />
-                <p className="text-sm text-foreground leading-relaxed">Use a clear, descriptive title that includes your main topic</p>
-              </div>
-              <div className="flex items-start gap-4 p-3 rounded-xl bg-background/50 hover:bg-background/70 transition-all duration-300 group">
-                <div className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0 group-hover:scale-150 transition-transform" />
-                <p className="text-sm text-foreground leading-relaxed">Write a compelling description that explains the value students will get</p>
-              </div>
-              <div className="flex items-start gap-4 p-3 rounded-xl bg-background/50 hover:bg-background/70 transition-all duration-300 group">
-                <div className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0 group-hover:scale-150 transition-transform" />
-                <p className="text-sm text-foreground leading-relaxed">Choose the most specific category that fits your course</p>
-              </div>
-            </CardContent>
-          </Card>
         </div>
       </div>
     </div>
@@ -834,45 +804,6 @@ export function CourseBuilder() {
             </CardContent>
           </Card>
 
-          <Card className="border-border/50 shadow-sm">
-            <CardHeader className="border-b border-border/50 bg-card/50">
-              <CardTitle className="flex items-center space-x-3">
-                <div className="w-10 h-10 rounded-xl bg-secondary/20 flex items-center justify-center">
-                  <Star className="w-5 h-5 text-secondary-foreground" />
-                </div>
-                <span className="text-lg font-medium">Structure Guidelines</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-6 space-y-4">
-              <div className="flex items-start space-x-4">
-                <div className="w-2 h-2 rounded-full bg-primary mt-3 flex-shrink-0" />
-                <div>
-                  <p className="text-sm font-medium text-foreground mb-1">Logical Organization</p>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    Group related content into sections with 5-7 lessons each for optimal learning flow
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-start space-x-4">
-                <div className="w-2 h-2 rounded-full bg-primary mt-3 flex-shrink-0" />
-                <div>
-                  <p className="text-sm font-medium text-foreground mb-1">Progressive Difficulty</p>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    Start with fundamentals and gradually introduce more complex concepts
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-start space-x-4">
-                <div className="w-2 h-2 rounded-full bg-primary mt-3 flex-shrink-0" />
-                <div>
-                  <p className="text-sm font-medium text-foreground mb-1">Practical Application</p>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    Include hands-on exercises and real-world examples in each section
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
         </div>
       </div>
     </div>
@@ -1039,9 +970,9 @@ export function CourseBuilder() {
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-4">
-              <Button 
+            <Button 
                 size="lg" 
-                className="w-full bg-gradient-to-r from-primary to-accent text-white"
+                className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
                 onClick={() => publishCourse(true)}
                 disabled={isPublishing}
               >
@@ -1102,31 +1033,31 @@ export function CourseBuilder() {
           
           <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 bg-card/50 backdrop-blur-xl border border-border/50 rounded-3xl p-8 shadow-xl">
             <div className="space-y-2">
-              <h1 className="text-5xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+              <h1 className="text-5xl font-bold text-foreground">
                 Create Your Course
               </h1>
               <p className="text-lg text-muted-foreground flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-primary animate-pulse" />
+                <BookOpen className="w-5 h-5 text-primary" />
                 Build something amazing that students will love
               </p>
             </div>
             
             {/* Stats Pills */}
             <div className="flex gap-3">
-              <div className="bg-gradient-to-br from-primary/10 to-accent/10 backdrop-blur-sm border border-primary/20 rounded-2xl px-6 py-4 shadow-lg">
+              <div className="bg-primary/10 border border-primary/20 rounded-2xl px-6 py-4 shadow-lg">
                 <div className="flex items-center gap-3">
-                  <Target className="w-5 h-5 text-primary" />
+                  <Settings className="w-5 h-5 text-primary" />
                   <div>
                     <div className="text-2xl font-bold text-primary">{currentStep}/{steps.length}</div>
                     <div className="text-xs text-muted-foreground">Steps</div>
                   </div>
                 </div>
               </div>
-              <div className="bg-gradient-to-br from-accent/10 to-primary/10 backdrop-blur-sm border border-accent/20 rounded-2xl px-6 py-4 shadow-lg">
+              <div className="bg-primary/10 border border-primary/20 rounded-2xl px-6 py-4 shadow-lg">
                 <div className="flex items-center gap-3">
-                  <TrendingUp className="w-5 h-5 text-accent" />
+                  <Clock className="w-5 h-5 text-primary" />
                   <div>
-                    <div className="text-2xl font-bold text-accent">{Math.round(getStepProgress())}%</div>
+                    <div className="text-2xl font-bold text-primary">{Math.round(getStepProgress())}%</div>
                     <div className="text-xs text-muted-foreground">Complete</div>
                   </div>
                 </div>
@@ -1139,17 +1070,12 @@ export function CourseBuilder() {
         <Card className="mb-10 overflow-hidden border-0 shadow-2xl bg-card/70 backdrop-blur-2xl animate-fade-in">
           <CardContent className="p-10">
             <div className="relative">
-              {/* Animated Gradient Progress Background */}
-              <div className="absolute top-12 left-12 right-12 h-3 bg-gradient-to-r from-muted/50 via-muted to-muted/50 rounded-full overflow-hidden backdrop-blur-sm">
+              {/* Progress Background */}
+              <div className="absolute top-12 left-12 right-12 h-3 bg-muted rounded-full overflow-hidden">
                 <div 
-                  className="h-full bg-gradient-to-r from-primary via-accent to-primary rounded-full transition-all duration-1000 ease-out relative overflow-hidden"
+                  className="h-full bg-primary rounded-full transition-all duration-1000 ease-out"
                   style={{ width: `${getStepProgress()}%` }}
-                >
-                  {/* Shimmer effect */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full animate-shimmer" style={{ animationDuration: '2s' }} />
-                  {/* Glow effect */}
-                  <div className="absolute inset-0 bg-white/20 blur-xl" />
-                </div>
+                />
               </div>
 
               {/* Interactive Step Indicators */}
@@ -1168,50 +1094,36 @@ export function CourseBuilder() {
                       onMouseEnter={() => setHoveredStep(step.id)}
                       onMouseLeave={() => setHoveredStep(null)}
                     >
-                      {/* Animated pulse ring for current step */}
-                      {isCurrent && (
-                        <>
-                          <div className="absolute top-0 w-24 h-24 rounded-full bg-primary/20 animate-ping" />
-                          <div className="absolute top-0 w-24 h-24 rounded-full bg-accent/10 animate-pulse" />
-                        </>
-                      )}
                       
                       {/* Step Icon Container */}
                       <div 
                         className={`
                           relative w-24 h-24 rounded-3xl flex items-center justify-center mb-5 transition-all duration-500 transform
-                          ${isCompleted ? 'bg-gradient-to-br from-primary via-primary to-accent text-primary-foreground shadow-2xl shadow-primary/40 scale-100 rotate-0' : ''}
-                          ${isCurrent ? 'bg-gradient-to-br from-primary via-accent to-primary text-primary-foreground shadow-2xl shadow-primary/60 scale-110 -rotate-3' : ''}
-                          ${!isCompleted && !isCurrent ? 'bg-gradient-to-br from-muted/80 to-muted text-muted-foreground group-hover:from-muted group-hover:to-muted/80 group-hover:scale-105 group-hover:shadow-xl' : ''}
-                          ${isHovered && !isCurrent && !isCompleted ? 'scale-105 shadow-xl' : ''}
+                          ${isCompleted ? 'bg-primary text-primary-foreground shadow-xl scale-100' : ''}
+                          ${isCurrent ? 'bg-primary text-primary-foreground shadow-xl scale-110' : ''}
+                          ${!isCompleted && !isCurrent ? 'bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:scale-105' : ''}
+                          ${isHovered && !isCurrent && !isCompleted ? 'scale-105' : ''}
                         `}
                       >
-                        {/* Inner glow */}
-                        {(isCurrent || isCompleted) && (
-                          <div className="absolute inset-2 bg-white/10 rounded-2xl blur-xl" />
-                        )}
                         
                         {/* Icon */}
                         {isCompleted ? (
-                          <div className="relative animate-scale-in">
-                            <Check className="w-9 h-9 drop-shadow-lg" strokeWidth={3} />
-                            <div className="absolute inset-0 bg-white/30 rounded-full blur-2xl animate-pulse" />
-                          </div>
+                          <Check className="w-9 h-9" strokeWidth={3} />
                         ) : (
-                          <StepIcon className={`w-9 h-9 ${isCurrent ? 'drop-shadow-lg' : ''}`} strokeWidth={isCurrent ? 2.5 : 2} />
+                          <StepIcon className="w-9 h-9" strokeWidth={2} />
                         )}
                         
                         {/* Step Number Badge */}
                         <div className={`
                           absolute -top-2 -right-2 w-8 h-8 rounded-xl flex items-center justify-center text-xs font-bold shadow-lg transition-all duration-300
-                          ${isCurrent ? 'bg-gradient-to-br from-accent to-primary text-primary-foreground scale-110' : 'bg-background text-muted-foreground border-2 border-border'}
+                          ${isCurrent ? 'bg-primary text-primary-foreground scale-110' : 'bg-background text-muted-foreground border-2 border-border'}
                         `}>
                           {step.id}
                         </div>
 
                         {/* Completion Checkmark Badge */}
                         {isCompleted && (
-                          <div className="absolute -bottom-2 -right-2 w-7 h-7 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center shadow-lg animate-scale-in">
+                          <div className="absolute -bottom-2 -right-2 w-7 h-7 rounded-full bg-green-500 flex items-center justify-center shadow-lg">
                             <Check className="w-4 h-4 text-white" strokeWidth={3} />
                           </div>
                         )}
@@ -1236,9 +1148,9 @@ export function CourseBuilder() {
 
                       {/* Interactive Hover Tooltip */}
                       {isHovered && !isCurrent && (
-                        <div className="absolute -bottom-10 bg-popover/95 backdrop-blur-sm text-popover-foreground px-4 py-2 rounded-xl text-xs font-medium shadow-2xl border border-border animate-fade-in z-50">
+                        <div className="absolute -bottom-10 bg-popover text-popover-foreground px-4 py-2 rounded-xl text-xs font-medium shadow-xl border border-border z-50">
                           <div className="flex items-center gap-2">
-                            <Zap className="w-3 h-3" />
+                            <ArrowRight className="w-3 h-3 text-primary" />
                             Jump to this step
                           </div>
                         </div>
@@ -1256,13 +1168,10 @@ export function CourseBuilder() {
           {renderStepContent()}
         </div>
 
-        {/* Ultra-Modern Floating Action Bar */}
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 w-full max-w-3xl px-4 animate-slide-up">
-          <Card className="border-0 shadow-2xl bg-card/95 backdrop-blur-2xl overflow-hidden">
-            {/* Animated gradient border effect */}
-            <div className="absolute inset-0 bg-gradient-to-r from-primary via-accent to-primary opacity-20 blur-xl" />
-            
-            <CardContent className="relative p-6">
+        {/* Floating Action Bar */}
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 w-full max-w-3xl px-4">
+          <Card className="border-0 shadow-xl bg-card/95 backdrop-blur-xl">
+            <CardContent className="p-6">
               <div className="flex items-center gap-4">
                 {/* Previous Button */}
                 {currentStep > 1 && (
@@ -1298,13 +1207,10 @@ export function CourseBuilder() {
                     }
                   }}
                   disabled={isPublishing}
-                  className="flex-1 bg-gradient-to-r from-primary via-accent to-primary text-primary-foreground hover:shadow-2xl hover:shadow-primary/40 transition-all duration-500 group relative overflow-hidden h-14"
+                  className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90 transition-all h-14"
                   size="lg"
                 >
-                  {/* Animated shimmer effect */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-                  
-                  <div className="relative flex items-center justify-center gap-2">
+                  <div className="flex items-center justify-center gap-2">
                     {currentStep === steps.length ? (
                       <>
                         {isPublishing ? (
@@ -1314,9 +1220,8 @@ export function CourseBuilder() {
                           </>
                         ) : (
                           <>
-                            <Zap className="w-5 h-5 animate-pulse" />
+                            <Globe className="w-5 h-5" />
                             <span className="font-bold text-lg">Publish Course</span>
-                            <Sparkles className="w-5 h-5 animate-pulse" />
                           </>
                         )}
                       </>
