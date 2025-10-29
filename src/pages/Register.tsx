@@ -241,7 +241,7 @@ const Register = () => {
       };
 
       // Create auth user with email, password, and metadata
-      const { error: otpError } = await supabase.auth.signUp({
+      const { data: signUpData, error: otpError } = await supabase.auth.signUp({
         email: finalData.email,
         password: finalData.password,
         options: {
@@ -252,18 +252,21 @@ const Register = () => {
           }
         }
       });
+
       if (otpError) {
-        // If the user already exists, guide them to sign in instead of waiting for an OTP
-        if (typeof otpError.message === 'string' && otpError.message.toLowerCase().includes('already')) {
-          toast({
-            variant: "destructive",
-            title: "Email déjà enregistré",
-            description: "Cet email a déjà un compte. Veuillez vous connecter."
-          });
-          setIsSubmitting(false);
-          return;
-        }
         throw otpError;
+      }
+
+      // Check if this is a repeated signup (user already exists)
+      // Supabase returns success but with identities = [] for existing users
+      if (signUpData?.user && (!signUpData.user.identities || signUpData.user.identities.length === 0)) {
+        toast({
+          variant: "destructive",
+          title: "Email déjà enregistré",
+          description: "Cet email a déjà un compte. Veuillez vous connecter au lieu de créer un nouveau compte."
+        });
+        setIsSubmitting(false);
+        return;
       }
 
       // Upload files from uploadedFiles state
