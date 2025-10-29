@@ -34,7 +34,7 @@ export default function StudentProfileDialog({
 }: StudentProfileDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-6xl w-full max-h-[85vh] p-0 overflow-hidden border-0 focus:outline-none focus-visible:outline-none shadow-2xl">
+      <DialogContent className="max-w-6xl w-full max-h-[85vh] p-0 overflow-hidden border-0 focus:outline-none focus-visible:outline-none shadow-2xl" aria-describedby={undefined}>
         <div className="overflow-y-auto h-full max-h-[85vh] modern-scrollbar">
           <StudentProfileContent />
         </div>

@@ -473,7 +473,7 @@ export function ContentItemEditor({ isOpen, onClose, contentItem, onSave, lesson
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto" aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2">
             <span>{contentItem ? "Edit" : "Add"} Content Item</span>

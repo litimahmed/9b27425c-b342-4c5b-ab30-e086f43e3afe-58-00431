@@ -274,6 +274,29 @@ export function CourseBuilder() {
     }
   };
 
+  // Ensure the current user has the 'teacher' role (via Edge Function)
+  const ensureTeacherRole = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return false;
+
+    const resp = await fetch(
+      "https://topmniglebzmcyxjnfll.supabase.co/functions/v1/ensure-teacher-role",
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      }
+    );
+
+    if (!resp.ok) {
+      const txt = await resp.text();
+      console.error('ensure-teacher-role failed:', txt);
+      return false;
+    }
+    return true;
+  };
+
   const publishCourse = async () => {
     setIsPublishing(true);
     try {
@@ -320,6 +343,9 @@ export function CourseBuilder() {
         setIsPublishing(false);
         return;
       }
+
+      // Ensure the user has the 'teacher' role before inserting (RLS requirement)
+      await ensureTeacherRole();
 
       toast.loading("Publishing your course...");
 

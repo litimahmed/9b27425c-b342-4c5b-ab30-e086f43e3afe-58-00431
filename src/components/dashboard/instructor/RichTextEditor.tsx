@@ -485,7 +485,7 @@ export function RichTextEditor({ content, onChange, placeholder }: RichTextEdito
                   <ImageIcon className="w-4 h-4" />
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-lg">
+              <DialogContent className="sm:max-w-lg" aria-describedby={undefined}>
                 <DialogHeader>
                   <DialogTitle className="text-xl font-semibold">Add Image</DialogTitle>
                 </DialogHeader>

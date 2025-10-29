@@ -304,7 +304,7 @@ export default function NewHeader({ isDark, toggleTheme, loading: externalLoadin
                             Login
                           </Button>
                         </DialogTrigger>
-                        <DialogContent className="fixed left-1/2 top-1/2 z-50 max-h-screen w-[95vw] max-w-5xl -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-xl p-0 shadow-xl">
+                        <DialogContent className="fixed left-1/2 top-1/2 z-50 max-h-screen w-[95vw] max-w-5xl -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-xl p-0 shadow-xl" aria-describedby={undefined}>
                           <AuthDialog onClose={closeModal} isDark={isDark} />
                         </DialogContent>
                       </Dialog>

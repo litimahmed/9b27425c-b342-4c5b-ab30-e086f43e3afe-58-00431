@@ -161,7 +161,7 @@ export function ThemeSelector({ isOpen, onClose, onSelectTheme, currentTheme }: 
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-7xl max-h-[90vh] overflow-hidden bg-gradient-to-br from-background/95 to-background border-border/50 backdrop-blur-xl shadow-2xl">
+      <DialogContent className="max-w-7xl max-h-[90vh] overflow-hidden bg-gradient-to-br from-background/95 to-background border-border/50 backdrop-blur-xl shadow-2xl" aria-describedby={undefined}>
         <div className="absolute inset-0 bg-gradient-to-br from-primary/2 via-transparent to-secondary/2 pointer-events-none"></div>
         
         <DialogHeader className="relative border-b border-border/30 pb-6">

@@ -771,7 +771,7 @@ export function ModernLearningPath() {
 
       {/* Module Details Modal */}
       <Dialog open={showModuleDetails} onOpenChange={setShowModuleDetails}>
-        <DialogContent className="max-w-4xl max-h-[90vh]">
+        <DialogContent className="max-w-4xl max-h-[90vh]" aria-describedby={undefined}>
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               {selectedModule && getStatusIcon(selectedModule.status, selectedModule.progress)}
