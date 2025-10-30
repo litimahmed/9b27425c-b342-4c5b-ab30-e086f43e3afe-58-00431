@@ -31,7 +31,6 @@ interface AmbientSoundContextType {
   changeVolume: (volume: number) => void;
   isSoundLoaded: (soundId: string) => boolean;
   isSoundLoading: (soundId: string) => boolean;
-  allSoundsLoaded: boolean;
 }
 
 const AmbientSoundContext = createContext<AmbientSoundContextType | null>(null);

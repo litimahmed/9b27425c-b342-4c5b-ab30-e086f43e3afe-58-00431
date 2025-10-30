@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback } from 'react';
 
 interface AmbientSound {
   id: string;
@@ -156,94 +156,17 @@ const AMBIENT_SOUNDS: AmbientSound[] = [
 
 
 export const useAmbientSounds = () => {
-  const [loadedSounds, setLoadedSounds] = useState<Map<string, LoadedSound>>(new Map());
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentSound, setCurrentSound] = useState<AmbientSound | null>(null);
   const [isLoading, setIsLoading] = useState<Set<string>>(new Set());
+  const [loadedSounds, setLoadedSounds] = useState<Set<string>>(new Set());
   const [volume, setVolume] = useState(() => {
     const savedVolume = localStorage.getItem('ambientSoundVolume');
     return savedVolume ? parseFloat(savedVolume) : 0.5;
   });
   
   const activeAudioRef = useRef<HTMLAudioElement | null>(null);
-  const preloadedRef = useRef<Map<string, LoadedSound>>(new Map());
-
-  // Preload all sounds
-  useEffect(() => {
-    const preloadSounds = async () => {
-      const loadPromises = AMBIENT_SOUNDS.map(async (sound) => {
-        try {
-          const audio = new Audio();
-          audio.preload = 'auto';
-          audio.loop = true;
-          audio.volume = volume;
-          
-          // Wait for the audio to be loaded
-          await new Promise<void>((resolve, reject) => {
-            const onCanPlayThrough = () => {
-              audio.removeEventListener('canplaythrough', onCanPlayThrough);
-              audio.removeEventListener('error', onError);
-              resolve();
-            };
-            
-            const onError = (e: any) => {
-              audio.removeEventListener('canplaythrough', onCanPlayThrough);
-              audio.removeEventListener('error', onError);
-              console.warn(`Failed to preload sound: ${sound.name}`, e);
-              resolve(); // Don't reject, just continue
-            };
-            
-            audio.addEventListener('canplaythrough', onCanPlayThrough);
-            audio.addEventListener('error', onError);
-            audio.src = sound.audioUrl;
-            audio.load();
-          });
-
-          const loadedSound: LoadedSound = {
-            ...sound,
-            audio,
-            isLoaded: true
-          };
-          
-          preloadedRef.current.set(sound.id, loadedSound);
-          return loadedSound;
-        } catch (error) {
-          console.warn(`Failed to preload sound: ${sound.name}`, error);
-          return null;
-        }
-      });
-
-      const results = await Promise.allSettled(loadPromises);
-      const loadedMap = new Map<string, LoadedSound>();
-      
-      results.forEach((result, index) => {
-        if (result.status === 'fulfilled' && result.value) {
-          loadedMap.set(AMBIENT_SOUNDS[index].id, result.value);
-        }
-      });
-      
-      setLoadedSounds(loadedMap);
-    };
-
-    preloadSounds();
-
-    // Cleanup function
-    return () => {
-      stopSound();
-      preloadedRef.current.forEach(sound => {
-        sound.audio.pause();
-        sound.audio.src = '';
-      });
-      preloadedRef.current.clear();
-    };
-  }, []);
-
-  // Update volume for all loaded sounds
-  useEffect(() => {
-    preloadedRef.current.forEach(sound => {
-      sound.audio.volume = volume;
-    });
-  }, [volume]);
+  const audioCache = useRef<Map<string, HTMLAudioElement>>(new Map());
 
   const stopSound = useCallback(() => {
     try {
@@ -263,20 +186,47 @@ export const useAmbientSounds = () => {
     try {
       setIsLoading(prev => new Set([...prev, sound.id]));
       
-      // Always stop current sound first
+      // Stop current sound first
       stopSound();
 
-      const loadedSound = preloadedRef.current.get(sound.id);
-      if (!loadedSound) {
-        console.warn(`Sound not loaded: ${sound.name}`);
-        return;
-      }
-
-      const audio = loadedSound.audio;
+      // Check if audio is cached
+      let audio = audioCache.current.get(sound.id);
       
-      // Reset and prepare audio
-      audio.currentTime = 0;
-      audio.volume = volume;
+      if (!audio) {
+        // Create new audio element only when needed
+        audio = new Audio();
+        audio.preload = 'none'; // Don't preload automatically
+        audio.loop = true;
+        audio.volume = volume;
+        audio.src = sound.audioUrl;
+        
+        // Wait for audio to be ready
+        await new Promise<void>((resolve, reject) => {
+          const onCanPlay = () => {
+            audio!.removeEventListener('canplay', onCanPlay);
+            audio!.removeEventListener('error', onError);
+            resolve();
+          };
+          
+          const onError = (e: any) => {
+            audio!.removeEventListener('canplay', onCanPlay);
+            audio!.removeEventListener('error', onError);
+            reject(new Error(`Failed to load audio: ${sound.name}`));
+          };
+          
+          audio!.addEventListener('canplay', onCanPlay);
+          audio!.addEventListener('error', onError);
+          audio!.load(); // Explicitly load when needed
+        });
+
+        // Cache the audio element
+        audioCache.current.set(sound.id, audio);
+        setLoadedSounds(prev => new Set([...prev, sound.id]));
+      } else {
+        // Reset cached audio
+        audio.currentTime = 0;
+        audio.volume = volume;
+      }
       
       // Play the audio
       await audio.play();
@@ -311,15 +261,20 @@ export const useAmbientSounds = () => {
     setVolume(newVolume);
     localStorage.setItem('ambientSoundVolume', newVolume.toString());
     
-    // Update volume for all preloaded sounds
-    preloadedRef.current.forEach(sound => {
-      sound.audio.volume = newVolume;
+    // Update volume for currently playing audio
+    if (activeAudioRef.current) {
+      activeAudioRef.current.volume = newVolume;
+    }
+    
+    // Update volume for all cached audio
+    audioCache.current.forEach(audio => {
+      audio.volume = newVolume;
     });
   }, []);
 
   const isSoundLoaded = useCallback((soundId: string) => {
-    return preloadedRef.current.has(soundId);
-  }, []);
+    return loadedSounds.has(soundId);
+  }, [loadedSounds]);
 
   const isSoundLoading = useCallback((soundId: string) => {
     return isLoading.has(soundId);
@@ -337,6 +292,6 @@ export const useAmbientSounds = () => {
     changeVolume,
     isSoundLoaded,
     isSoundLoading,
-    allSoundsLoaded: loadedSounds.size === AMBIENT_SOUNDS.length,
+    allSoundsLoaded: true, // Always ready since we load on demand
   };
 };

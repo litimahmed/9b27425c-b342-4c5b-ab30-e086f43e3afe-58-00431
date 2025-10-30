@@ -20,6 +20,7 @@ import {
   BreadcrumbPage,
 } from "@/components/ui/breadcrumb";
 import UserProfileDropdown from "@/components/ui/UserProfileDropdown";
+import { useLocation } from "react-router-dom";
 
 interface DashboardHeaderProps {
   isDark: boolean;
@@ -27,7 +28,10 @@ interface DashboardHeaderProps {
 }
 
 export function DashboardHeader({ isDark, toggleTheme }: DashboardHeaderProps) {
-  // Force refresh - Avatar components have been replaced with UserProfileDropdown
+  const location = useLocation();
+  const isTeacherDashboard = location.pathname.includes('/teacher');
+  const portalName = isTeacherDashboard ? "Teacher Portal" : "Student Portal";
+  
   return (
     <header className="h-16 bg-card border-b border-border px-6 flex items-center justify-between sticky top-0 z-40 backdrop-blur-sm">
       {/* Left Section - Breadcrumbs */}
@@ -39,7 +43,7 @@ export function DashboardHeader({ isDark, toggleTheme }: DashboardHeaderProps) {
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>Student Portal</BreadcrumbPage>
+              <BreadcrumbPage>{portalName}</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>

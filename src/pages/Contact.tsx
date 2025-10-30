@@ -335,7 +335,7 @@ const Contact = () => {
                 Browse courses, track progress, and connect with peers in our learning community.
               </p>
               <Button variant="secondary" size="sm">
-                Student Portal
+                Student Dashboard
               </Button>
             </Card>
 

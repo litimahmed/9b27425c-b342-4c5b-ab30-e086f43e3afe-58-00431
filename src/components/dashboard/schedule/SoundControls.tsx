@@ -1,6 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
@@ -12,8 +11,7 @@ import {
   Play, 
   Pause,
   Loader2,
-  Waves,
-  CheckCircle
+  Waves
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAmbientSoundContext } from "@/contexts/AmbientSoundContext";
@@ -31,14 +29,12 @@ export function SoundControls() {
     stopSound,
     isSoundLoaded,
     isSoundLoading,
-    allSoundsLoaded,
   } = useAmbientSoundContext();
   
   const [activeCategory, setActiveCategory] = useState("nature");
 
   const getSoundStatus = (soundId: string) => {
     if (isSoundLoading(soundId)) return 'loading';
-    if (!isSoundLoaded(soundId)) return 'not-loaded';
     if (currentSound?.id === soundId && isPlaying) return 'playing';
     return 'ready';
   };
@@ -55,20 +51,6 @@ export function SoundControls() {
               )}
             </div>
             <span className="text-lg">Focus Sounds</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            {!allSoundsLoaded && (
-              <Badge variant="secondary" className="text-xs">
-                <Loader2 className="w-3 h-3 mr-1 animate-spin" />
-                Loading...
-              </Badge>
-            )}
-            {allSoundsLoaded && (
-              <Badge variant="outline" className="text-xs">
-                <CheckCircle className="w-3 h-3 mr-1 text-green-500" />
-                Ready
-              </Badge>
-            )}
           </div>
         </CardTitle>
       </CardHeader>
@@ -132,14 +114,13 @@ export function SoundControls() {
                             "group relative overflow-hidden rounded-lg border transition-all duration-200",
                             isCurrentlyPlaying && "border-primary bg-primary/5 shadow-sm",
                             status === 'ready' && !isCurrentlyPlaying && "hover:border-muted-foreground/30 hover:bg-muted/30",
-                            status === 'loading' && "border-muted",
-                            status === 'not-loaded' && "border-destructive/20 bg-destructive/5"
+                            status === 'loading' && "border-muted"
                           )}
                         >
                           <Button
                             variant="ghost"
                             onClick={() => toggleSound(sound)}
-                            disabled={status === 'loading' || status === 'not-loaded'}
+                            disabled={status === 'loading'}
                             className={cn(
                               "w-full h-auto p-3 flex items-center justify-between hover:bg-transparent",
                               isCurrentlyPlaying && "text-primary"
@@ -149,8 +130,6 @@ export function SoundControls() {
                               <div className="flex items-center justify-center w-9 h-9 rounded-full bg-muted/50 shrink-0">
                                 {status === 'loading' ? (
                                   <Loader2 className="w-4 h-4 animate-spin" />
-                                ) : status === 'not-loaded' ? (
-                                  <VolumeX className="w-4 h-4 text-destructive" />
                                 ) : (
                                   <span className="text-base">{sound.icon}</span>
                                 )}
