@@ -1,190 +1,238 @@
 import { useState } from "react";
-import { TrendingUp, Users, Eye, DollarSign, Clock, Star, ArrowUpRight, ArrowDownRight, BookOpen, Target, Award } from "lucide-react";
+import { TrendingUp, Users, Eye, Clock, BookOpen, Award, Activity } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 
 export function AnalyticsDashboard() {
   const [timeRange, setTimeRange] = useState("30d");
-  const [selectedCourse, setSelectedCourse] = useState("all");
+  const [hoveredDay, setHoveredDay] = useState<number | null>(null);
 
-  const performanceMetrics = [
-    { label: "Course Views", value: "24,567", change: "+12.5%", trend: "up", icon: Eye },
-    { label: "Enrollments", value: "1,234", change: "+8.2%", trend: "up", icon: Users },
-    { label: "Completion Rate", value: "78%", change: "+5.3%", trend: "up", icon: Target },
-    { label: "Avg Watch Time", value: "42 min", change: "-2.1%", trend: "down", icon: Clock },
-    { label: "Revenue", value: "$24,350", change: "+15.7%", trend: "up", icon: DollarSign },
-    { label: "Avg Rating", value: "4.8", change: "+0.2", trend: "up", icon: Star },
+  const weeklyData = [
+    { day: "Mon", views: 450, enrollments: 45, completion: 75 },
+    { day: "Tue", views: 520, enrollments: 52, completion: 78 },
+    { day: "Wed", views: 480, enrollments: 48, completion: 72 },
+    { day: "Thu", views: 580, enrollments: 58, completion: 80 },
+    { day: "Fri", views: 620, enrollments: 62, completion: 85 },
+    { day: "Sat", views: 390, enrollments: 38, completion: 70 },
+    { day: "Sun", views: 340, enrollments: 32, completion: 68 },
   ];
 
-  const coursePerformance = [
-    { name: "Complete React Development", students: 2847, completion: 82, revenue: 14235, rating: 4.8, engagement: 89 },
-    { name: "JavaScript Fundamentals", students: 1923, completion: 75, revenue: 9615, rating: 4.6, engagement: 85 },
-    { name: "TypeScript Advanced", students: 1456, completion: 68, revenue: 7280, rating: 4.9, engagement: 92 },
+  const courses = [
+    { 
+      name: "Complete React Development", 
+      progress: 82, 
+      students: 2847, 
+      rating: 4.8,
+      color: "bg-primary" 
+    },
+    { 
+      name: "JavaScript Fundamentals", 
+      progress: 75, 
+      students: 1923, 
+      rating: 4.6,
+      color: "bg-accent" 
+    },
+    { 
+      name: "TypeScript Advanced", 
+      progress: 68, 
+      students: 1456, 
+      rating: 4.9,
+      color: "bg-secondary" 
+    },
   ];
 
-  const engagementData = [
-    { day: "Mon", views: 450, completions: 120, enrollments: 45 },
-    { day: "Tue", views: 520, completions: 135, enrollments: 52 },
-    { day: "Wed", views: 480, completions: 128, enrollments: 48 },
-    { day: "Thu", views: 580, completions: 145, enrollments: 58 },
-    { day: "Fri", views: 620, completions: 156, enrollments: 62 },
-    { day: "Sat", views: 390, completions: 98, enrollments: 38 },
-    { day: "Sun", views: 340, completions: 85, enrollments: 32 },
-  ];
+  const maxValue = Math.max(...weeklyData.map(d => d.views));
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto">
       {/* Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-primary/10 via-accent/5 to-secondary/5 p-8">
-        <div className="relative z-10">
-          <h1 className="text-4xl font-bold text-foreground mb-2">Analytics Dashboard</h1>
-          <p className="text-lg text-muted-foreground">Track your course performance and student engagement</p>
-        </div>
+      <div className="space-y-2">
+        <h1 className="text-3xl font-bold text-foreground">Analytics</h1>
+        <p className="text-muted-foreground">Visual overview of your teaching performance</p>
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-wrap gap-4">
-        <Tabs value={timeRange} onValueChange={setTimeRange}>
-          <TabsList>
-            <TabsTrigger value="7d">7 Days</TabsTrigger>
-            <TabsTrigger value="30d">30 Days</TabsTrigger>
-            <TabsTrigger value="90d">90 Days</TabsTrigger>
-            <TabsTrigger value="1y">1 Year</TabsTrigger>
-          </TabsList>
-        </Tabs>
+      {/* Time Range */}
+      <Tabs value={timeRange} onValueChange={setTimeRange}>
+        <TabsList>
+          <TabsTrigger value="7d">Week</TabsTrigger>
+          <TabsTrigger value="30d">Month</TabsTrigger>
+          <TabsTrigger value="90d">Quarter</TabsTrigger>
+          <TabsTrigger value="1y">Year</TabsTrigger>
+        </TabsList>
+      </Tabs>
 
-        <Select value={selectedCourse} onValueChange={setSelectedCourse}>
-          <SelectTrigger className="w-[250px]">
-            <SelectValue placeholder="Select course" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Courses</SelectItem>
-            <SelectItem value="react">Complete React Development</SelectItem>
-            <SelectItem value="javascript">JavaScript Fundamentals</SelectItem>
-            <SelectItem value="typescript">TypeScript Advanced</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* Performance Metrics Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {performanceMetrics.map((metric) => (
-          <Card key={metric.label} className="hover:shadow-lg transition-all duration-300 border-0 bg-gradient-to-br from-card to-card/50">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="p-3 rounded-xl bg-primary/10">
-                  <metric.icon className="w-6 h-6 text-primary" />
-                </div>
-                <Badge variant={metric.trend === "up" ? "default" : "secondary"} className="flex items-center gap-1">
-                  {metric.trend === "up" ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
-                  {metric.change}
-                </Badge>
+      {/* Key Metrics - Visual Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card className="hover:shadow-lg transition-all duration-300 cursor-pointer group">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                <Eye className="w-5 h-5 text-primary" />
               </div>
-              <p className="text-sm font-medium text-muted-foreground mb-1">{metric.label}</p>
-              <p className="text-3xl font-bold text-foreground">{metric.value}</p>
-            </CardContent>
-          </Card>
-        ))}
+            </div>
+            <div className="space-y-2">
+              <div className="text-3xl font-bold text-foreground">24.5K</div>
+              <div className="text-sm text-muted-foreground">Total Views</div>
+              <Progress value={75} className="h-1" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="hover:shadow-lg transition-all duration-300 cursor-pointer group">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 rounded-lg bg-accent/10 group-hover:bg-accent/20 transition-colors">
+                <Users className="w-5 h-5 text-accent" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <div className="text-3xl font-bold text-foreground">1.2K</div>
+              <div className="text-sm text-muted-foreground">Students</div>
+              <Progress value={82} className="h-1" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="hover:shadow-lg transition-all duration-300 cursor-pointer group">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 rounded-lg bg-success/10 group-hover:bg-success/20 transition-colors">
+                <Clock className="w-5 h-5 text-success" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <div className="text-3xl font-bold text-foreground">42m</div>
+              <div className="text-sm text-muted-foreground">Avg Watch Time</div>
+              <Progress value={68} className="h-1" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="hover:shadow-lg transition-all duration-300 cursor-pointer group">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 rounded-lg bg-warning/10 group-hover:bg-warning/20 transition-colors">
+                <Award className="w-5 h-5 text-warning" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <div className="text-3xl font-bold text-foreground">4.8</div>
+              <div className="text-sm text-muted-foreground">Avg Rating</div>
+              <Progress value={96} className="h-1" />
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Engagement Chart */}
+      {/* Interactive Weekly Chart */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <TrendingUp className="w-5 h-5 text-primary" />
-            Weekly Engagement Trends
+            <Activity className="w-5 h-5 text-primary" />
+            Weekly Activity
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="h-80 flex items-end justify-between gap-4">
-            {engagementData.map((data, index) => (
-              <div key={index} className="flex-1 flex flex-col items-center gap-3">
-                <div className="w-full flex flex-col gap-2">
-                  <div className="relative h-48 flex items-end">
+          <div className="space-y-8">
+            {/* Chart */}
+            <div className="h-64 flex items-end justify-between gap-2">
+              {weeklyData.map((data, index) => (
+                <div 
+                  key={index} 
+                  className="flex-1 flex flex-col items-center gap-3 group"
+                  onMouseEnter={() => setHoveredDay(index)}
+                  onMouseLeave={() => setHoveredDay(null)}
+                >
+                  <div className="relative w-full h-56 flex items-end">
                     <div
-                      className="w-full bg-primary/20 rounded-t-lg relative overflow-hidden group cursor-pointer hover:bg-primary/30 transition-colors"
-                      style={{ height: `${(data.views / 700) * 100}%` }}
+                      className="w-full bg-primary/20 rounded-t-lg transition-all duration-300 hover:bg-primary/30 cursor-pointer relative overflow-hidden"
+                      style={{ height: `${(data.views / maxValue) * 100}%` }}
                     >
                       <div className="absolute inset-0 bg-gradient-to-t from-primary/40 to-transparent" />
-                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                        <span className="text-xs font-medium text-foreground bg-background/90 px-2 py-1 rounded">{data.views}</span>
-                      </div>
+                      
+                      {/* Tooltip on hover */}
+                      {hoveredDay === index && (
+                        <div className="absolute -top-20 left-1/2 -translate-x-1/2 bg-card border border-border rounded-lg p-3 shadow-lg whitespace-nowrap z-10 animate-fade-in">
+                          <div className="space-y-1 text-xs">
+                            <div className="flex justify-between gap-4">
+                              <span className="text-muted-foreground">Views:</span>
+                              <span className="font-semibold">{data.views}</span>
+                            </div>
+                            <div className="flex justify-between gap-4">
+                              <span className="text-muted-foreground">Enrollments:</span>
+                              <span className="font-semibold">{data.enrollments}</span>
+                            </div>
+                            <div className="flex justify-between gap-4">
+                              <span className="text-muted-foreground">Completion:</span>
+                              <span className="font-semibold">{data.completion}%</span>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
+                  <span className="text-xs font-medium text-muted-foreground">{data.day}</span>
                 </div>
-                <span className="text-sm font-medium text-muted-foreground">{data.day}</span>
-              </div>
-            ))}
-          </div>
-          <div className="mt-6 flex items-center justify-center gap-6 text-sm">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-primary/40" />
-              <span className="text-muted-foreground">Views</span>
+              ))}
             </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-success" />
-              <span className="text-muted-foreground">Completions</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-accent" />
-              <span className="text-muted-foreground">Enrollments</span>
+
+            {/* Trend Indicator */}
+            <div className="flex items-center justify-center gap-2 text-sm">
+              <TrendingUp className="w-4 h-4 text-success" />
+              <span className="text-muted-foreground">
+                <span className="font-semibold text-success">+12.5%</span> vs last week
+              </span>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Course Performance Table */}
+      {/* Course Performance - Visual Progress */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <BookOpen className="w-5 h-5 text-primary" />
-            Course Performance Breakdown
+            Course Performance
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-6">
-            {coursePerformance.map((course) => (
-              <div key={course.name} className="p-6 rounded-xl bg-muted/20 hover:bg-muted/30 transition-colors">
-                <div className="flex items-start justify-between mb-4">
-                  <div>
-                    <h3 className="font-semibold text-lg text-foreground mb-1">{course.name}</h3>
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                      <span className="flex items-center gap-1">
-                        <Users className="w-4 h-4" />
-                        {course.students} students
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Star className="w-4 h-4 text-warning fill-current" />
-                        {course.rating}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <DollarSign className="w-4 h-4" />
-                        ${course.revenue.toLocaleString()}
-                      </span>
+            {courses.map((course, index) => (
+              <div 
+                key={index} 
+                className="group p-6 rounded-xl bg-muted/20 hover:bg-muted/30 transition-all duration-300 cursor-pointer"
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-2 h-12 rounded-full ${course.color}`} />
+                    <div>
+                      <h3 className="font-semibold text-foreground">{course.name}</h3>
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground mt-1">
+                        <span className="flex items-center gap-1">
+                          <Users className="w-3 h-3" />
+                          {course.students.toLocaleString()}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Award className="w-3 h-3" />
+                          {course.rating} ★
+                        </span>
+                      </div>
                     </div>
                   </div>
-                  <Badge variant="default" className="bg-success/10 text-success">
-                    {course.engagement}% Engagement
-                  </Badge>
+                  <div className="text-right">
+                    <div className="text-2xl font-bold text-foreground">{course.progress}%</div>
+                    <div className="text-xs text-muted-foreground">Completion</div>
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <div className="flex items-center justify-between text-sm mb-2">
-                      <span className="text-muted-foreground">Completion Rate</span>
-                      <span className="font-medium text-foreground">{course.completion}%</span>
-                    </div>
-                    <Progress value={course.completion} className="h-2" />
-                  </div>
-                  <div>
-                    <div className="flex items-center justify-between text-sm mb-2">
-                      <span className="text-muted-foreground">Student Engagement</span>
-                      <span className="font-medium text-foreground">{course.engagement}%</span>
-                    </div>
-                    <Progress value={course.engagement} className="h-2" />
+                {/* Visual Progress Bar */}
+                <div className="relative h-3 bg-muted rounded-full overflow-hidden">
+                  <div 
+                    className={`absolute inset-y-0 left-0 ${course.color} rounded-full transition-all duration-500 group-hover:opacity-90`}
+                    style={{ width: `${course.progress}%` }}
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent to-white/20" />
                   </div>
                 </div>
               </div>
@@ -193,32 +241,35 @@ export function AnalyticsDashboard() {
         </CardContent>
       </Card>
 
-      {/* Insights */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="bg-gradient-to-br from-success/5 to-primary/5">
-          <CardContent className="p-6">
-            <Award className="w-10 h-10 text-success mb-4" />
-            <h3 className="font-semibold text-lg mb-2">Top Performer</h3>
-            <p className="text-sm text-muted-foreground mb-2">TypeScript Advanced has the highest rating</p>
-            <p className="text-2xl font-bold text-success">4.9 ⭐</p>
+      {/* Quick Insights */}
+      <div className="grid md:grid-cols-3 gap-4">
+        <Card className="bg-gradient-to-br from-success/5 to-success/10 border-success/20">
+          <CardContent className="p-6 text-center">
+            <div className="w-12 h-12 rounded-full bg-success/20 flex items-center justify-center mx-auto mb-3">
+              <Award className="w-6 h-6 text-success" />
+            </div>
+            <div className="text-2xl font-bold text-foreground mb-1">TypeScript</div>
+            <div className="text-sm text-muted-foreground">Highest rated course</div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-primary/5 to-accent/5">
-          <CardContent className="p-6">
-            <TrendingUp className="w-10 h-10 text-primary mb-4" />
-            <h3 className="font-semibold text-lg mb-2">Fastest Growing</h3>
-            <p className="text-sm text-muted-foreground mb-2">React Development enrollment surge</p>
-            <p className="text-2xl font-bold text-primary">+22%</p>
+        <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
+          <CardContent className="p-6 text-center">
+            <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-3">
+              <TrendingUp className="w-6 h-6 text-primary" />
+            </div>
+            <div className="text-2xl font-bold text-foreground mb-1">+22%</div>
+            <div className="text-sm text-muted-foreground">Fastest growing</div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-warning/5 to-accent/5">
-          <CardContent className="p-6">
-            <Target className="w-10 h-10 text-warning mb-4" />
-            <h3 className="font-semibold text-lg mb-2">Needs Attention</h3>
-            <p className="text-sm text-muted-foreground mb-2">Improve completion rate</p>
-            <p className="text-2xl font-bold text-warning">JavaScript</p>
+        <Card className="bg-gradient-to-br from-warning/5 to-warning/10 border-warning/20">
+          <CardContent className="p-6 text-center">
+            <div className="w-12 h-12 rounded-full bg-warning/20 flex items-center justify-center mx-auto mb-3">
+              <Clock className="w-6 h-6 text-warning" />
+            </div>
+            <div className="text-2xl font-bold text-foreground mb-1">42 min</div>
+            <div className="text-sm text-muted-foreground">Avg engagement time</div>
           </CardContent>
         </Card>
       </div>
