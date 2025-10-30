@@ -27,66 +27,40 @@ const CareersHero = () => {
                 </p>
               </div>
 
-              {/* Stats */}
-              <div className="grid grid-cols-3 gap-6">
-                <div className="text-center">
-                  <div className="flex items-center justify-center w-12 h-12 bg-primary/10 rounded-lg mb-2 mx-auto">
-                    <Users className="w-6 h-6 text-primary" />
-                  </div>
-                  <div className="text-2xl font-bold text-foreground">50+</div>
-                  <div className="text-sm text-muted-foreground">Team Members</div>
+              {/* Key highlights */}
+              <div className="grid grid-cols-3 gap-4 text-sm">
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Users className="w-4 h-4 text-primary" />
+                  <span>50+ Team Members</span>
                 </div>
-                <div className="text-center">
-                  <div className="flex items-center justify-center w-12 h-12 bg-primary/10 rounded-lg mb-2 mx-auto">
-                    <MapPin className="w-6 h-6 text-primary" />
-                  </div>
-                  <div className="text-2xl font-bold text-foreground">3</div>
-                  <div className="text-sm text-muted-foreground">Office Locations</div>
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <MapPin className="w-4 h-4 text-primary" />
+                  <span>3 Locations</span>
                 </div>
-                <div className="text-center">
-                  <div className="flex items-center justify-center w-12 h-12 bg-primary/10 rounded-lg mb-2 mx-auto">
-                    <TrendingUp className="w-6 h-6 text-primary" />
-                  </div>
-                  <div className="text-2xl font-bold text-foreground">200%</div>
-                  <div className="text-sm text-muted-foreground">Growth Rate</div>
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <TrendingUp className="w-4 h-4 text-primary" />
+                  <span>200% Growth</span>
                 </div>
               </div>
 
-              {/* CTA Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Button 
-                  size="lg" 
-                  className="group"
-                  onClick={() => document.getElementById('open-positions')?.scrollIntoView({ behavior: 'smooth' })}
-                >
-                  View Open Positions
-                  <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="lg"
-                  onClick={() => document.getElementById('company-culture')?.scrollIntoView({ behavior: 'smooth' })}
-                >
-                  Learn About Our Culture
-                </Button>
-              </div>
+              {/* CTA Button */}
+              <Button 
+                size="lg" 
+                className="group w-fit"
+                onClick={() => document.getElementById('open-positions')?.scrollIntoView({ behavior: 'smooth' })}
+              >
+                View Open Positions
+                <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+              </Button>
             </div>
 
-            {/* Image/Visual */}
+            {/* Image */}
             <div className="relative">
-              <div className="relative bg-gradient-to-r from-primary/20 to-accent/20 rounded-2xl p-8 h-96">
-                <div 
-                  className="absolute inset-0 rounded-2xl bg-cover bg-center bg-no-repeat"
-                  style={{ backgroundImage: `url(${careersHeroOverlay})` }}
-                ></div>
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/40 via-primary/20 to-transparent rounded-2xl"></div>
-                <div className="relative h-full flex items-center justify-center">
-                </div>
-              </div>
-              
-              {/* Floating Elements */}
-              <div className="absolute -top-4 -right-4 w-20 h-20 bg-accent/20 rounded-full blur-xl animate-pulse"></div>
-              <div className="absolute -bottom-4 -left-4 w-16 h-16 bg-primary/20 rounded-full blur-xl"></div>
+              <img 
+                src={careersHeroOverlay}
+                alt="Team collaboration"
+                className="w-full h-96 rounded-2xl object-cover shadow-2xl"
+              />
             </div>
           </div>
         </div>

@@ -177,42 +177,6 @@ const ApplicationProcess = () => {
             })}
           </div>
 
-          {/* Assessment Types */}
-          <div className="grid lg:grid-cols-2 gap-8 mb-16">
-            <Card className="border-border/50">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-foreground">
-                  <Code className="w-5 h-5 text-primary" />
-                  Technical Roles Assessment
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {assessmentTypes.technical.map((item, index) => (
-                  <div key={index} className="flex justify-between items-center p-3 bg-accent/5 rounded-lg">
-                    <span className="font-medium text-foreground">{item.role}</span>
-                    <span className="text-sm text-muted-foreground">{item.assessment}</span>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-
-            <Card className="border-border/50">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-foreground">
-                  <Users className="w-5 h-5 text-primary" />
-                  Business Roles Assessment
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {assessmentTypes.business.map((item, index) => (
-                  <div key={index} className="flex justify-between items-center p-3 bg-accent/5 rounded-lg">
-                    <span className="font-medium text-foreground">{item.role}</span>
-                    <span className="text-sm text-muted-foreground">{item.assessment}</span>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-          </div>
 
           {/* Contact & FAQ */}
           <div className="grid lg:grid-cols-2 gap-8">

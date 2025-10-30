@@ -1,11 +1,6 @@
-import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
-import { Skeleton } from "@/components/ui/skeleton";
 import CareersHero from "@/components/careers/CareersHero";
-import WhyWorkWithUs from "@/components/careers/WhyWorkWithUs";
 import OpenPositions from "@/components/careers/OpenPositions";
-import BenefitsSection from "@/components/careers/BenefitsSection";
-import CompanyCulture from "@/components/careers/CompanyCulture";
 import ApplicationProcess from "@/components/careers/ApplicationProcess";
 
 const Careers = () => {
@@ -19,22 +14,8 @@ const Careers = () => {
       </Helmet>
 
       <div className="min-h-screen bg-background">
-        {/* Hero Section */}
         <CareersHero />
-        
-        {/* Why Work With Us */}
-        <WhyWorkWithUs />
-        
-        {/* Open Positions */}
         <OpenPositions />
-        
-        {/* Benefits & Compensation */}
-        <BenefitsSection />
-        
-        {/* Company Culture */}
-        <CompanyCulture />
-        
-        {/* Application Process */}
         <ApplicationProcess />
       </div>
     </>
